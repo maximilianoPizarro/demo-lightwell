@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>demo-lightwell — Lightwell Java on OpenShift Dev Spaces</title>
+  <meta name="description" content="Demo journey: Lightwell Maven registry, Nexus, OpenShift Dev Spaces, Pipelines, Quay, and RHDA/TPA." />
+  <link rel="icon" href="brand/demo-lightwell-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700&family=Red+Hat+Text:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --rh-color-brand-red: #ee0000;
+      --rh-color-brand-red-dark: #a60000;
+      --rh-color-text-primary: #151515;
+      --rh-color-text-secondary: #6a6e73;
+      --rh-color-surface: #ffffff;
+      --rh-color-surface-subtle: #f2f2f2;
+      --rh-color-border: #d2d2d2;
+      --rh-font-display: "Red Hat Display", "RedHatDisplay", sans-serif;
+      --rh-font-text: "Red Hat Text", "RedHatText", sans-serif;
+      --max: 72rem;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--rh-font-text);
+      color: var(--rh-color-text-primary);
+      background:
+        radial-gradient(1200px 500px at 10% -10%, #fce3e3 0%, transparent 55%),
+        linear-gradient(180deg, #fff 0%, var(--rh-color-surface-subtle) 100%);
+      min-height: 100vh;
+    }
+    a { color: var(--rh-color-brand-red); text-decoration-thickness: 1px; }
+    a:hover { color: var(--rh-color-brand-red-dark); }
+    header {
+      border-bottom: 1px solid var(--rh-color-border);
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(8px);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .bar {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .bar nav { display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.95rem; }
+    .bar nav a { color: var(--rh-color-text-primary); text-decoration: none; font-weight: 500; }
+    .bar nav a:hover { color: var(--rh-color-brand-red); }
+    .rh-mark { height: 28px; }
+    main { max-width: var(--max); margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2rem;
+      align-items: center;
+      margin-bottom: 3rem;
+    }
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; }
+    }
+    .hero h1 {
+      font-family: var(--rh-font-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.1;
+      margin: 0.5rem 0 1rem;
+      font-weight: 700;
+    }
+    .hero p.lead {
+      font-size: 1.125rem;
+      color: var(--rh-color-text-secondary);
+      max-width: 38rem;
+      margin: 0 0 1.5rem;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--rh-color-brand-red);
+    }
+    .cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.1rem;
+      border-radius: 3px;
+      font-family: var(--rh-font-display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--rh-color-brand-red);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--rh-color-brand-red-dark); color: #fff; }
+    .btn-secondary {
+      background: #fff;
+      border-color: var(--rh-color-border);
+      color: var(--rh-color-text-primary);
+    }
+    .logo-card {
+      background: #fff;
+      border: 1px solid var(--rh-color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 8px 24px rgba(21,21,21,.06);
+    }
+    .logo-card img.lw { width: min(100%, 320px); height: auto; }
+    .logo-card img.icon { width: 96px; height: 96px; border-radius: 12px; }
+    section { margin: 2.75rem 0; }
+    h2 {
+      font-family: var(--rh-font-display);
+      font-size: 1.6rem;
+      margin: 0 0 0.75rem;
+    }
+    .muted { color: var(--rh-color-text-secondary); margin: 0 0 1.25rem; max-width: 40rem; }
+    .stack {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 800px) { .stack { grid-template-columns: 1fr; } }
+    .tile {
+      background: #fff;
+      border: 1px solid var(--rh-color-border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      min-height: 100%;
+    }
+    .tile img { width: 48px; height: 48px; }
+    .tile h3 {
+      font-family: var(--rh-font-display);
+      font-size: 1.05rem;
+      margin: 0;
+    }
+    .tile p { margin: 0; color: var(--rh-color-text-secondary); font-size: 0.95rem; flex: 1; }
+    .tile a { font-weight: 600; font-size: 0.9rem; }
+    .arch {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--rh-color-border);
+      background: #fff;
+    }
+    .steps {
+      counter-reset: step;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.75rem;
+    }
+    .steps li {
+      background: #fff;
+      border: 1px solid var(--rh-color-border);
+      border-radius: 8px;
+      padding: 1rem 1rem 1rem 3.2rem;
+      position: relative;
+    }
+    .steps li::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 50%;
+      background: var(--rh-color-brand-red);
+      color: #fff;
+      font-family: var(--rh-font-display);
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: grid;
+      place-items: center;
+    }
+    footer {
+      border-top: 1px solid var(--rh-color-border);
+      padding: 2rem 1.25rem;
+      color: var(--rh-color-text-secondary);
+      font-size: 0.85rem;
+    }
+    footer .inner { max-width: var(--max); margin: 0 auto; }
+    .badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+    .badges img { height: 20px; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9em;
+      background: var(--rh-color-surface-subtle);
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <a href="./" aria-label="Home">
+        <img class="rh-mark" src="brand/redhat-logo-on-light.svg" alt="Red Hat" />
+      </a>
+      <nav>
+        <a href="JOURNEY.md">Journey</a>
+        <a href="JOURNEY-REMEDIATED.md">Remediated</a>
+        <a href="https://github.com/maximilianoPizarro/demo-lightwell">GitHub</a>
+        <a href="https://artifacthub.io/packages/search?repo=demo-lightwell">Artifact Hub</a>
+        <a href="https://www.redhat.com/en/lightwell">Lightwell</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Red Hat Lightwell Network · Java demo</div>
+        <h1>Secure legacy Java deps on OpenShift Dev Spaces</h1>
+        <p class="lead">
+          End-to-end demo: Maven resolves through Nexus into the Lightwell validated registry,
+          RHDA/TPA surfaces CVEs in the IDE, Tekton builds with Red Hat images, and Quay holds the contingency image.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="https://github.com/maximilianoPizarro/demo-lightwell">View on GitHub</a>
+          <a class="btn btn-secondary" href="JOURNEY.md">3-step DevSpaces journey</a>
+          <a class="btn btn-secondary" href="charts/">Helm charts</a>
+        </div>
+        <div class="badges">
+          <img alt="License" src="https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square" />
+          <img alt="Helm" src="https://img.shields.io/badge/Helm-charts-0F1689?style=flat-square&logo=helm&logoColor=white" />
+          <img alt="Dev Spaces" src="https://img.shields.io/badge/OpenShift-Dev%20Spaces-EE0000?style=flat-square" />
+          <img alt="Pipelines" src="https://img.shields.io/badge/OpenShift-Pipelines-EE0000?style=flat-square" />
+          <img alt="Quay" src="https://img.shields.io/badge/Quay-contingency-40B4E5?style=flat-square" />
+          <img alt="Lightwell" src="https://img.shields.io/badge/Lightwell-validated%20demo-EE0000?style=flat-square" />
+        </div>
+      </div>
+      <div class="logo-card">
+        <img class="lw" src="brand/lightwell_logo_light.svg" alt="Official Lightwell logo" />
+        <img class="icon" src="brand/demo-lightwell-icon.png" alt="demo-lightwell package icon" />
+        <p class="muted" style="margin:0;text-align:center;font-size:0.85rem;">
+          Official Lightwell mark from
+          <a href="https://www.redhat.com/en/lightwell">redhat.com/en/lightwell</a>
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Platform stack</h2>
+      <p class="muted">Official Red Hat technology icons (console.redhat.com) used for product recognition.</p>
+      <div class="stack">
+        <article class="tile">
+          <img src="brand/openshift-dev-spaces.svg" alt="OpenShift Dev Spaces" />
+          <h3>OpenShift Dev Spaces</h3>
+          <p>Cloud IDE with RHDA (Trusted Profile Analyzer / Dependency Analytics) and a 3-command journey.</p>
+          <a href="https://developers.redhat.com/products/openshift-dev-spaces">Product page →</a>
+        </article>
+        <article class="tile">
+          <img src="brand/openshift-pipelines.svg" alt="OpenShift Pipelines" />
+          <h3>OpenShift Pipelines</h3>
+          <p>Tekton pipeline builds the WAR via Nexus→Lightwell and deploys the JBoss/WildFly app.</p>
+          <a href="https://www.redhat.com/en/technologies/cloud-computing/openshift/pipelines">Product page →</a>
+        </article>
+        <article class="tile">
+          <img src="brand/quay.svg" alt="Red Hat Quay" />
+          <h3>Red Hat Quay</h3>
+          <p>Contingency image published by GitHub Actions (Maven direct to Lightwell, no Nexus).</p>
+          <a href="https://www.redhat.com/en/technologies/cloud-computing/quay">Product page →</a>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Architecture</h2>
+      <p class="muted">DevSpaces / Tekton → Nexus → Lightwell registry; GHA contingency → Quay → JBoss console.</p>
+      <img class="arch" src="lightwell-architecture.png" alt="Lightwell demo architecture diagram" />
+    </section>
+
+    <section>
+      <h2>Developer journey</h2>
+      <ol class="steps">
+        <li>Create a Dev Spaces workspace from this Git repository (<code>.devfile.yaml</code>).</li>
+        <li>Run <strong>demo-up</strong> — Nexus + Lightwell proxy + JBoss (contingency or Tekton).</li>
+        <li>Open <code>app/pom.xml</code> → Red Hat Dependency Analytics Report (CVEs / TPA).</li>
+        <li>Run <strong>open-jboss-console</strong> for the management Route.</li>
+      </ol>
+      <p style="margin-top:1rem;">
+        Day-2 with a subscription:
+        <a href="JOURNEY-REMEDIATED.md">switch validated → remediated</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Documentation</h2>
+      <ul>
+        <li><a href="https://docs.redhat.com/en/documentation/red_hat_lightwell_network/current/configure-configure_java_build_tool">Configure Java build tool (Lightwell)</a></li>
+        <li><a href="https://docs.redhat.com/en/documentation/red_hat_lightwell_network/current/configure-configure_nexus_to_use_rhln_repository">Configure Nexus for Lightwell</a></li>
+        <li><a href="https://docs.redhat.com/en/documentation/red_hat_trusted_profile_analyzer/1/html/quick_start_guide/configuring-visual-studio-code-to-use-dependency-analytics_qsg">Trusted Profile Analyzer / Dependency Analytics</a></li>
+        <li><a href="https://ux.redhat.com/">Red Hat design system (ux.redhat.com)</a> — tokens &amp; typography</li>
+        <li><a href="charts/">Helm chart index (Artifact Hub source)</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <div class="inner">
+      <p>
+        Community demo — not an official Red Hat product. Lightwell, OpenShift, Quay, and related marks are trademarks of Red Hat, Inc. or its affiliates.
+        Branding references <a href="https://ux.redhat.com/tokens/color/">RHDS color tokens</a>
+        (<code>--rh-color-brand-red #ee0000</code>) and
+        <a href="https://fonts.google.com/specimen/Red+Hat+Display">Red Hat Display / Text</a>.
+      </p>
+      <p>© 2026 demo-lightwell contributors · <a href="https://github.com/maximilianoPizarro/demo-lightwell">Source</a></p>
+    </div>
+  </footer>
+</body>
+</html>

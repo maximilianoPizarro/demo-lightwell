@@ -1,6 +1,46 @@
 apiVersion: v2
 name: nexus
-description: Lightweight Nexus Repository OSS (single pod + PVC) for Lightwell demo
+description: Lightweight Nexus Repository OSS (single pod + PVC) proxying Red Hat Lightwell Maven validated/remediated tiers for the demo-lightwell journey on OpenShift Dev Spaces.
 type: application
 version: 0.1.0
 appVersion: "3.70.1"
+home: https://maximilianopizarro.github.io/demo-lightwell/
+icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/demo-lightwell-icon.png
+keywords:
+  - lightwell
+  - nexus
+  - maven
+  - supply-chain
+  - openshift
+  - security
+sources:
+  - https://github.com/maximilianoPizarro/demo-lightwell
+maintainers:
+  - name: Maximiliano Pizarro
+    email: maximiliano.pizarro.5@gmail.com
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/category: security
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://maximilianopizarro.github.io/demo-lightwell/
+    - name: Journey (validated demo)
+      url: https://github.com/maximilianoPizarro/demo-lightwell/blob/main/docs/JOURNEY.md
+    - name: Journey (remediated)
+      url: https://github.com/maximilianoPizarro/demo-lightwell/blob/main/docs/JOURNEY-REMEDIATED.md
+    - name: Lightwell product
+      url: https://www.redhat.com/en/lightwell
+    - name: Configure Nexus for Lightwell
+      url: https://docs.redhat.com/en/documentation/red_hat_lightwell_network/current/configure-configure_nexus_to_use_rhln_repository
+    - name: Source
+      url: https://github.com/maximilianoPizarro/demo-lightwell
+  artifacthub.io/images: |
+    - name: nexus
+      image: docker.io/sonatype/nexus3:3.70.1
+  artifacthub.io/screenshots: |
+    - title: Architecture
+      url: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/lightwell-architecture.png
+  artifacthub.io/changes: |
+    - kind: added
+      description: Initial thin Nexus chart with Lightwell proxy configure Job

@@ -1,0 +1,63 @@
+name: GitHub Pages + Helm chart index
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.4
+
+      - name: Build site + chart repository
+        run: |
+          mkdir -p _site/charts
+          cp -r docs/* _site/
+          cp LICENSE _site/ 2>/dev/null || true
+          helm package charts/nexus -d _site/charts
+          helm package charts/jboss-app -d _site/charts
+          helm repo index _site/charts --url https://maximilianopizarro.github.io/demo-lightwell/charts
+          cp artifacthub-repo.yml _site/charts/artifacthub-repo.yml
+          # Landing note for charts path
+          cat > _site/charts/README.md <<'EOF'
+          # Helm charts — demo-lightwell
+
+          ```bash
+          helm repo add demo-lightwell https://maximilianopizarro.github.io/demo-lightwell/charts
+          helm repo update
+          helm search repo demo-lightwell
+          ```
+
+          Register this URL on [Artifact Hub](https://artifacthub.io/) as a Helm charts repository.
+          EOF
+          ls -la _site/charts
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

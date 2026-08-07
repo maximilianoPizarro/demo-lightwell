@@ -1,12 +1,59 @@
 # demo-lightwell
 
-Lightwell Java demo for **OpenShift Dev Spaces** on Developer Sandbox: legacy WAR → **Nexus** (PVC) proxy → Lightwell **validated** demo registry, CVEs via **Red Hat Dependency Analytics** (TPA/TDA), **Tekton** + **Quay**, and a **GitHub Actions** contingency path that builds **without Nexus**.
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE)
+[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-222?style=flat-square)](https://maximilianopizarro.github.io/demo-lightwell/)
+[![Helm](https://img.shields.io/badge/Helm-charts-0F1689?style=flat-square&logo=helm&logoColor=white)](https://maximilianopizarro.github.io/demo-lightwell/charts/)
+[![Artifact Hub](https://img.shields.io/badge/Artifact%20Hub-ready-417598?style=flat-square)](https://artifacthub.io/packages/search?repo=demo-lightwell)
+[![OpenShift Dev Spaces](https://img.shields.io/badge/OpenShift-Dev%20Spaces-EE0000?style=flat-square)](https://developers.redhat.com/products/openshift-dev-spaces)
+[![OpenShift Pipelines](https://img.shields.io/badge/OpenShift-Pipelines-EE0000?style=flat-square)](https://www.redhat.com/en/technologies/cloud-computing/openshift/pipelines)
+[![Quay](https://img.shields.io/badge/Quay-contingency-40B4E5?style=flat-square)](https://www.redhat.com/en/technologies/cloud-computing/quay)
+[![Lightwell](https://img.shields.io/badge/Lightwell-validated%20demo-EE0000?style=flat-square)](https://www.redhat.com/en/lightwell)
 
-## Quick links
+<p align="center">
+  <img src="docs/brand/lightwell_logo_light.svg" alt="Official Lightwell logo" width="360" />
+</p>
 
-- [Developer journey](docs/JOURNEY.md) (3 DevSpaces steps)
-- [Remediated switch (subscription)](docs/JOURNEY-REMEDIATED.md)
-- [Architecture diagram](docs/lightwell-architecture.png)
+<p align="center">
+  <img src="docs/brand/openshift-dev-spaces.svg" alt="OpenShift Dev Spaces" height="48" />
+  &nbsp;&nbsp;
+  <img src="docs/brand/openshift-pipelines.svg" alt="OpenShift Pipelines" height="48" />
+  &nbsp;&nbsp;
+  <img src="docs/brand/quay.svg" alt="Red Hat Quay" height="48" />
+</p>
+
+Lightwell Java demo for **OpenShift Dev Spaces** on Developer Sandbox: legacy WAR → **Nexus** (PVC) proxy → Lightwell **validated** demo registry, CVEs via **Red Hat Dependency Analytics** (TPA/TDA), **OpenShift Pipelines (Tekton)** + **Quay**, and a **GitHub Actions** contingency path that builds **without Nexus**.
+
+## Documentation
+
+| Resource | Link |
+|----------|------|
+| **Site (GitHub Pages)** | https://maximilianopizarro.github.io/demo-lightwell/ |
+| Developer journey (3 steps) | [docs/JOURNEY.md](docs/JOURNEY.md) |
+| Remediated switch (subscription) | [docs/JOURNEY-REMEDIATED.md](docs/JOURNEY-REMEDIATED.md) |
+| Architecture | [docs/lightwell-architecture.png](docs/lightwell-architecture.png) |
+| Brand / logos attribution | [docs/brand/ATTRIBUTION.md](docs/brand/ATTRIBUTION.md) |
+| Lightwell product | https://www.redhat.com/en/lightwell |
+| Configure Maven (Lightwell) | https://docs.redhat.com/en/documentation/red_hat_lightwell_network/current/configure-configure_java_build_tool |
+| Configure Nexus (Lightwell) | https://docs.redhat.com/en/documentation/red_hat_lightwell_network/current/configure-configure_nexus_to_use_rhln_repository |
+| Trusted Profile Analyzer / RHDA | https://docs.redhat.com/en/documentation/red_hat_trusted_profile_analyzer/1/html/quick_start_guide/configuring-visual-studio-code-to-use-dependency-analytics_qsg |
+| Design tokens (ux.redhat.com) | https://ux.redhat.com/tokens/color/ |
+| Artifact Hub (register charts URL) | `https://maximilianopizarro.github.io/demo-lightwell/charts` |
+
+## Artifact Hub
+
+1. Publish GitHub Pages (workflow `.github/workflows/pages-charts.yml`).
+2. On [Artifact Hub](https://artifacthub.io/), add a **Helm charts** repository:
+   - URL: `https://maximilianopizarro.github.io/demo-lightwell/charts`
+3. Copy the repository ID into [`artifacthub-repo.yml`](artifacthub-repo.yml) (`repositoryID`) for Verified Publisher.
+
+Charts include Artifact Hub annotations in `charts/*/Chart.yaml` (links, category, screenshots, license).
+
+```bash
+helm repo add demo-lightwell https://maximilianopizarro.github.io/demo-lightwell/charts
+helm repo update
+helm install nexus demo-lightwell/nexus
+helm install jboss-app demo-lightwell/jboss-app
+```
 
 ## Layout
 
@@ -15,9 +62,11 @@ app/                  Maven WAR (commons-io / commons-fileupload Lightwell versi
 charts/nexus/         Thin Nexus OSS + PVC + Lightwell configure Job
 charts/jboss-app/     WildFly/JBoss deploy + app & management Routes
 pipelines/            Tekton Pipeline (maven → buildah → helm)
-.github/workflows/    Contingency image (Maven → Lightwell direct → Quay :contingency)
+.github/workflows/    Contingency image + GitHub Pages / Helm index
 .devfile.yaml         demo-up / analyze-cves / open-jboss-console
+docs/                 Pages site, journeys, brand logos
 scripts/              setup-secrets, demo-up, cleanup, tier helpers
+artifacthub-repo.yml  Artifact Hub repository metadata
 ```
 
 ## Secrets (never commit)
@@ -57,9 +106,9 @@ oc start-build demo-lightwell --from-dir=. --follow
 helm upgrade --install jboss-app ./charts/jboss-app \
   --set image.repository=image-registry.openshift-image-registry.svc:5000/$(oc project -q)/demo-lightwell \
   --set image.tag=contingency \
-  --set image.pullSecrets=null
+  --set image.pullSecrets={}
 ```
 
 ## License / demo notice
 
-Demo content targets Red Hat Lightwell **public demo** validated index. For production remediated tier see [JOURNEY-REMEDIATED.md](docs/JOURNEY-REMEDIATED.md). Rotate any credentials that were shared in chat after setup.
+Apache-2.0. Demo content targets Red Hat Lightwell **public demo** validated index. Trademarks remain with their owners — see [docs/brand/ATTRIBUTION.md](docs/brand/ATTRIBUTION.md). For production remediated tier see [JOURNEY-REMEDIATED.md](docs/JOURNEY-REMEDIATED.md). Rotate any credentials that were shared in chat after setup.

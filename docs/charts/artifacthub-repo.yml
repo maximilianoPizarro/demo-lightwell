@@ -1,0 +1,6 @@
+# Artifact Hub repository metadata (served next to Helm index.yaml on GitHub Pages)
+# https://maximilianopizarro.github.io/demo-lightwell/charts/
+repositoryID: ""
+owners:
+  - name: Maximiliano Pizarro
+    email: maximiliano.pizarro.5@gmail.com

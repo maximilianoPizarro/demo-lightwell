@@ -1,0 +1,9 @@
+# Artifact Hub repository metadata
+# After registering the Helm repo on https://artifacthub.io, paste the repository ID below
+# to enable the Verified Publisher flag.
+#
+# Docs: https://artifacthub.io/docs/topics/repositories/
+repositoryID: ""
+owners:
+  - name: Maximiliano Pizarro
+    email: maximiliano.pizarro.5@gmail.com

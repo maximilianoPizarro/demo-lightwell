@@ -1,6 +1,41 @@
 apiVersion: v2
 name: jboss-app
-description: JBoss/WildFly app deployment for Lightwell demo
+description: JBoss/WildFly deployment for the Lightwell Java demo WAR (app + management console Routes) on OpenShift.
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
+home: https://maximilianopizarro.github.io/demo-lightwell/
+icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/demo-lightwell-icon.png
+keywords:
+  - lightwell
+  - jboss
+  - wildfly
+  - java
+  - openshift
+sources:
+  - https://github.com/maximilianoPizarro/demo-lightwell
+maintainers:
+  - name: Maximiliano Pizarro
+    email: maximiliano.pizarro.5@gmail.com
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://maximilianopizarro.github.io/demo-lightwell/
+    - name: Journey
+      url: https://github.com/maximilianoPizarro/demo-lightwell/blob/main/docs/JOURNEY.md
+    - name: Lightwell product
+      url: https://www.redhat.com/en/lightwell
+    - name: Source
+      url: https://github.com/maximilianoPizarro/demo-lightwell
+  artifacthub.io/images: |
+    - name: app
+      image: quay.io/maximilianopizarro/demo-lightwell:contingency
+  artifacthub.io/screenshots: |
+    - title: Architecture
+      url: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/lightwell-architecture.png
+  artifacthub.io/changes: |
+    - kind: added
+      description: Initial JBoss/WildFly chart with app and management Routes

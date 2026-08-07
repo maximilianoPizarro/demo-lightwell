@@ -203,8 +203,19 @@
       font-size: 0.85rem;
     }
     footer .inner { max-width: var(--max); margin: 0 auto; }
-    .badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+    .badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; align-items: center; }
     .badges img { height: 20px; }
+    .badges a img { height: 28px; }
+    .btn-devspaces {
+      display: inline-flex;
+      align-items: center;
+      line-height: 0;
+      border-radius: 3px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(238, 0, 0, 0.25);
+    }
+    .btn-devspaces img { height: 36px; width: auto; display: block; }
+    .btn-devspaces:hover { opacity: 0.92; }
     code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 0.9em;
@@ -240,14 +251,16 @@
           RHDA/TPA surfaces CVEs in the IDE, Tekton builds with Red Hat images, and Quay holds the contingency image.
         </p>
         <div class="cta">
+          <a class="btn-devspaces" href="https://devspaces.sandbox.developer.redhat.com/#https://github.com/maximilianoPizarro/demo-lightwell" title="Open in Red Hat OpenShift Dev Spaces">
+            <img alt="Open in Dev Spaces" src="https://img.shields.io/badge/Open_in-Dev_Spaces-EE0000?logo=redhat&amp;style=for-the-badge" height="36" />
+          </a>
           <a class="btn btn-primary" href="https://github.com/maximilianoPizarro/demo-lightwell">View on GitHub</a>
           <a class="btn btn-secondary" href="https://github.com/maximilianoPizarro/demo-lightwell/blob/main/docs/JOURNEY.md">3-step DevSpaces journey</a>
           <a class="btn btn-secondary" href="charts/">Helm charts</a>
         </div>
         <div class="badges">
           <img alt="License" src="https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square" />
-          <img alt="Helm" src="https://img.shields.io/badge/Helm-charts-0F1689?style=flat-square&logo=helm&logoColor=white" />
-          <img alt="Dev Spaces" src="https://img.shields.io/badge/OpenShift-Dev%20Spaces-EE0000?style=flat-square" />
+          <img alt="Helm" src="https://img.shields.io/badge/Helm-charts-0F1689?style=flat-square&amp;logo=helm&amp;logoColor=white" />
           <img alt="Pipelines" src="https://img.shields.io/badge/OpenShift-Pipelines-EE0000?style=flat-square" />
           <img alt="Quay" src="https://img.shields.io/badge/Quay-contingency-40B4E5?style=flat-square" />
           <img alt="Lightwell" src="https://img.shields.io/badge/Lightwell-validated%20demo-EE0000?style=flat-square" />

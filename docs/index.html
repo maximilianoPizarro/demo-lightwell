@@ -331,6 +331,51 @@
       max-width: 48rem;
     }
     .muted.wide { max-width: 48rem; }
+    details.troubleshooting {
+      margin-top: 1.5rem;
+      max-width: 48rem;
+      background: #fff;
+      border: 1px solid var(--rh-color-border);
+      border-radius: 8px;
+    }
+    details.troubleshooting summary {
+      padding: 1rem 1.25rem;
+      font-family: var(--rh-font-display);
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+    }
+    details.troubleshooting summary:hover { background: var(--rh-color-surface-subtle); }
+    details.troubleshooting > div {
+      padding: 0 1.25rem 1rem;
+      color: var(--rh-color-text-secondary);
+      font-size: 0.95rem;
+    }
+    details.troubleshooting p { margin: 0.5rem 0; }
+    .glossary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+    .term {
+      background: #fff;
+      border: 1px solid var(--rh-color-border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+    }
+    .term dt {
+      font-family: var(--rh-font-display);
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 0.25rem;
+      color: var(--rh-color-text-primary);
+    }
+    .term dd {
+      margin: 0;
+      color: var(--rh-color-text-secondary);
+      font-size: 0.92rem;
+    }
   </style>
 </head>
 <body>
@@ -340,6 +385,7 @@
         <img class="rh-mark" src="brand/redhat-logo-on-light.svg" alt="Red Hat" />
       </a>
       <nav>
+        <a href="#glossary">Glossary</a>
         <a href="#run">Run</a>
         <a href="#access">Access</a>
         <a href="#rhda">RHDA report</a>
@@ -433,6 +479,37 @@
       <img class="arch" src="lightwell-architecture.png" alt="Lightwell demo architecture diagram" />
     </section>
 
+    <section id="glossary">
+      <h2>Terminology &amp; Glossary</h2>
+      <p class="muted wide">Key Red Hat ecosystem terms used in this demo.</p>
+      <dl class="glossary-grid">
+        <div class="term">
+          <dt>RHDA / TPA</dt>
+          <dd>Red Hat Dependency Analytics / Trusted Profile Analyzer. The IDE scanner that reads your POM to flag vulnerabilities and Red Hat remediations.</dd>
+        </div>
+        <div class="term">
+          <dt>Lightwell (.rhlw)</dt>
+          <dd>Red Hat Lightwell Network. Provides rebuilt, remediated Java libraries appended with the <code>.rhlw</code> suffix to address CVEs without waiting for upstream.</dd>
+        </div>
+        <div class="term">
+          <dt>OSV</dt>
+          <dd>Open Source Vulnerabilities database. The underlying data source that RHDA queries, which may still report upstream CVEs on validated builds.</dd>
+        </div>
+        <div class="term">
+          <dt>GAV</dt>
+          <dd>Group, Artifact, Version. The standard Maven coordinates (e.g., <code>commons-io:commons-io:2.11.0</code>).</dd>
+        </div>
+        <div class="term">
+          <dt>SA / JWT</dt>
+          <dd>Service Account / JSON Web Token. The credential used by Nexus to authenticate as an organization proxy against Lightwell's registry.</dd>
+        </div>
+        <div class="term">
+          <dt>HAL</dt>
+          <dd>The WildFly management console interface used to inspect the running JBoss/WildFly server.</dd>
+        </div>
+      </dl>
+    </section>
+
     <section id="run">
       <h2>Run the demo (3 steps)</h2>
       <p class="muted wide">
@@ -498,19 +575,22 @@
           The passwords <code>Admin#123</code> and <code>admin123</code> shown above are strictly for this sandbox/demo environment. They are hardcoded/defaulted purely to make the demo reproducible and <strong>must not be reused in any real deployment</strong>.
         </p>
       </div>
-      <div class="callout" style="max-width:48rem;">
-        <p><strong>HAL console notes</strong></p>
-        <p>
-          Use the <em>management</em> Route host (not the app Route). Leave the Route path empty so both
-          <code>/console</code> and <code>/management</code> work on the same host — a <code>/console</code>-only path breaks Bootstrap (503).
-          Login: username <code>admin</code>, password <code>Admin#123</code> (override via Secret <code>jboss-admin</code> keys <code>username</code> / <code>password</code>).
-        </p>
-        <p>
-          If the browser console shows <code>/management</code> <strong>403</strong> and “Authentication required” while Keycloak adapter is 404,
-          WildFly rejected the HAL <code>Origin</code> header. The chart sets <code>MANAGEMENT_ALLOWED_ORIGINS</code> to the management Route HTTPS URL
-          (http-interface <code>allowed-origins</code>). Keycloak 404 is expected — this demo uses local ManagementRealm digest auth, not Keycloak.
-        </p>
-      </div>
+
+      <details class="troubleshooting">
+        <summary>HAL Console troubleshooting: 403 or "Authentication required"</summary>
+        <div>
+          <p>
+            Use the <em>management</em> Route host (not the app Route). Leave the Route path empty so both
+            <code>/console</code> and <code>/management</code> work on the same host — a <code>/console</code>-only path breaks Bootstrap (503).
+          </p>
+          <p>
+            If the browser console shows <code>/management</code> <strong>403</strong> and “Authentication required” while Keycloak adapter is 404,
+            WildFly rejected the HAL <code>Origin</code> header. The chart sets <code>MANAGEMENT_ALLOWED_ORIGINS</code> to the management Route HTTPS URL
+            (http-interface <code>allowed-origins</code>). Keycloak 404 is expected — this demo uses local ManagementRealm digest auth, not Keycloak.
+          </p>
+        </div>
+      </details>
+
       <figure style="margin-top:1.25rem;">
         <img class="proof-shot" src="journey/14-demo-app-home.png" alt="Lightwell Java Demo app home showing commons-io rhlw version" style="background:#fff;" />
         <figcaption class="proof-caption">

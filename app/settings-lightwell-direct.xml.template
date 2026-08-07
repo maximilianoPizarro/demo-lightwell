@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Maven settings for direct Lightwell access (no Nexus).
+  Matches Red Hat Lightwell docs (validated demo index).
   Placeholders replaced by CI / scripts:
-    __LIGHTWELL_SERVER_ID__  e.g. lightwell-validated | lightwell-remediated
+    __LIGHTWELL_SERVER_ID__  e.g. lightwell-validated
     __LIGHTWELL_URL__        repository URL
     __LIGHTWELL_USERNAME__   SA username (XXXXXXX|name)
     __LIGHTWELL_PASSWORD__   SA token
@@ -23,22 +24,37 @@
       <repositories>
         <repository>
           <id>__LIGHTWELL_SERVER_ID__</id>
-          <name>Lightwell Network</name>
+          <name>Red Hat Lightwell Network - Validated</name>
           <url>__LIGHTWELL_URL__</url>
-          <releases><enabled>true</enabled></releases>
-          <snapshots><enabled>false</enabled></snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
         </repository>
         <repository>
           <id>central</id>
+          <name>Maven Central</name>
           <url>https://repo.maven.apache.org/maven2</url>
-          <releases><enabled>true</enabled></releases>
-          <snapshots><enabled>false</enabled></snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
         </repository>
       </repositories>
       <pluginRepositories>
         <pluginRepository>
           <id>central</id>
           <url>https://repo.maven.apache.org/maven2</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
         </pluginRepository>
       </pluginRepositories>
     </profile>

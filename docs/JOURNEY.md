@@ -8,8 +8,9 @@ Focus: **secure development** for legacy Java — remediate vulnerable third-par
 2. **Lightwell** provides a validated Maven repository of remediations (demo tier: `public-lightwell-demo/.../validated/`).
 3. **Nexus** (thin chart + PVC) proxies Lightwell with a **service account** — the enterprise pattern.
 4. **OpenShift Dev Spaces** opens this repo ([factory URL](https://workspaces.openshift.com/#https://github.com/maximilianoPizarro/demo-lightwell)); Maven resolves via Nexus; **RHDA** shows CVEs on `pom.xml`.
-5. **Tekton** builds through Nexus→Lightwell and deploys the app (optional Quay push).
-6. Open the **app home** and the **WildFly management console**.
+5. **Tekton** builds through Nexus→Lightwell and deploys the app (optional Quay push from the cluster).
+6. **GitHub Actions** on `main` publishes to **Quay** (`latest` / `contingency` / `sha-…`); **GHCR** is the public fallback.
+7. Open the **app home** and the **WildFly management console**.
 
 ## Architecture
 
@@ -30,7 +31,7 @@ Focus: **secure development** for legacy Java — remediate vulnerable third-par
 | 8. OpenShift Pipelines detail | ![Pipeline detail](journey/09b-pipelinerun-detail.png) |
 | 8b. Tekton maven logs → Nexus `commons-io` `.rhlw` | ![Maven Nexus commons-io](journey/09c-tekton-maven-nexus-commons-io.png) |
 | 8c. Tekton maven logs → Nexus `.rhlw` jars | ![Maven Nexus jars](journey/09d-tekton-maven-nexus-jars.png) |
-| 9. GHCR image tags (`:contingency`) | ![GHCR](journey/10-ghcr-image-tags.png) |
+| 9. Quay image tags (`latest` / `contingency`) | ![Quay](journey/10-quay-tags.png) (carousel falls back to [GHCR](journey/10-ghcr-image-tags.png) if missing) |
 | 10. Artifact Hub charts | ![Artifact Hub](journey/11-artifacthub-charts.png) |
 | 10b. Artifact Hub Security Report (image summary) | ![Security CVEs](journey/11b-artifacthub-security-cves.png) |
 | 11. Stock commons-io CVE (not Lightwell GAV) | ![CVE-2024-47554](journey/12-artifacthub-commons-io-cve-stock.png) |

@@ -2,8 +2,8 @@ replicaCount: 1
 
 image:
   # Default for Sandbox: OpenShift internal registry (set NS at install).
-  # GHA publishes ghcr.io/<owner>/demo-lightwell:contingency as the public release.
-  # Quay is optional (requires robot Write).
+  # GHA publishes quay.io/<owner>/demo-lightwell (latest/contingency) when Quay secrets exist.
+  # GHCR ghcr.io/<owner>/demo-lightwell:contingency is the public fallback.
   repository: image-registry.openshift-image-registry.svc:5000/REPLACE_NS/demo-lightwell
   tag: latest
   pullPolicy: IfNotPresent

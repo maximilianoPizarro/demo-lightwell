@@ -157,34 +157,133 @@
     }
     .tile p { margin: 0; color: var(--rh-color-text-secondary); font-size: 0.95rem; flex: 1; }
     .tile a { font-weight: 600; font-size: 0.9rem; }
-    .journey-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-    }
-    @media (max-width: 800px) { .journey-grid { grid-template-columns: 1fr; } }
-    .journey-card {
-      background: #fff;
+    .journey-carousel {
+      position: relative;
+      background: #0f0f10;
       border: 1px solid var(--rh-color-border);
-      border-radius: 8px;
+      border-radius: 12px;
       overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+      max-width: 56rem;
     }
-    .journey-card img {
+    .journey-carousel:focus { outline: 2px solid var(--rh-color-brand-red); outline-offset: 3px; }
+    .journey-viewport {
+      position: relative;
+      min-height: min(58vh, 420px);
+      background: #151515;
+    }
+    .journey-slide {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      margin: 0;
+    }
+    .journey-slide.is-active { display: flex; }
+    .journey-slide img {
       width: 100%;
-      height: auto;
+      height: min(52vh, 380px);
+      object-fit: contain;
+      object-position: center top;
+      background: #1a1a1a;
       display: block;
-      border-bottom: 1px solid var(--rh-color-border);
     }
-    .journey-card figcaption {
-      padding: 0.75rem 1rem;
-      font-size: 0.9rem;
-      color: var(--rh-color-text-secondary);
+    .journey-slide .slide-cta {
+      min-height: min(52vh, 380px);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      background: linear-gradient(160deg, #1c1c1c 0%, #2a1212 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: #f5f5f5;
     }
-    .journey-card strong {
+    .journey-slide .slide-cta p { margin: 0; color: #d2d2d2; max-width: 28rem; }
+    .journey-slide figcaption {
+      padding: 1rem 1.25rem 1.15rem;
+      background: #fff;
+      border-top: 1px solid var(--rh-color-border);
+    }
+    .journey-slide .slide-num {
+      display: inline-block;
+      font-family: var(--rh-font-display);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--rh-color-brand-red);
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+    .journey-slide strong {
       display: block;
       color: var(--rh-color-text-primary);
       font-family: var(--rh-font-display);
+      font-size: 1.15rem;
       margin-bottom: 0.25rem;
+    }
+    .journey-slide figcaption span.desc {
+      color: var(--rh-color-text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+    .journey-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: #fff;
+      border-top: 1px solid var(--rh-color-border);
+    }
+    .journey-nav {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .journey-btn {
+      appearance: none;
+      border: 1px solid var(--rh-color-border);
+      background: #fff;
+      color: var(--rh-color-text-primary);
+      font-family: var(--rh-font-display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .journey-btn:hover { border-color: var(--rh-color-brand-red); color: var(--rh-color-brand-red); }
+    .journey-btn:focus-visible { outline: 2px solid var(--rh-color-brand-red); outline-offset: 2px; }
+    .journey-dots {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.35rem;
+      flex: 1;
+    }
+    .journey-dot {
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 50%;
+      border: none;
+      padding: 0;
+      background: #c8c8c8;
+      cursor: pointer;
+    }
+    .journey-dot[aria-current="true"] {
+      background: var(--rh-color-brand-red);
+      transform: scale(1.25);
+    }
+    .journey-status {
+      font-size: 0.8rem;
+      color: var(--rh-color-text-secondary);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    @media (max-width: 640px) {
+      .journey-status { display: none; }
+      .journey-viewport { min-height: 320px; }
+      .journey-slide img, .journey-slide .slide-cta { height: auto; min-height: 240px; }
     }
     .callout {
       background: #fff;
@@ -434,7 +533,7 @@
           <img alt="License" src="https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square" />
           <img alt="Helm" src="https://img.shields.io/badge/Helm-charts-0F1689?style=flat-square&amp;logo=helm&amp;logoColor=white" />
           <img alt="Pipelines" src="https://img.shields.io/badge/OpenShift-Pipelines-EE0000?style=flat-square" />
-          <img alt="Quay" src="https://img.shields.io/badge/Quay-contingency-40B4E5?style=flat-square" />
+          <img alt="Quay" src="https://img.shields.io/badge/Quay-latest%20%7C%20contingency-40B4E5?style=flat-square" />
           <img alt="Lightwell" src="https://img.shields.io/badge/Lightwell-validated%20demo-EE0000?style=flat-square" />
           <img alt="CVE proof" src="https://img.shields.io/badge/CVE--2024--47554-stock%20vs%20.rhlw-c9190b?style=flat-square" />
         </div>
@@ -467,7 +566,7 @@
         <article class="tile">
           <img src="brand/quay.svg" alt="Red Hat Quay" />
           <h3>Red Hat Quay</h3>
-          <p>Contingency image published by GitHub Actions (Maven direct to Lightwell, no Nexus).</p>
+          <p>Primary release registry: GHA pushes <code>latest</code> / <code>contingency</code> to <code>quay.io/…/demo-lightwell</code> (GHCR is the public fallback).</p>
           <a href="https://www.redhat.com/en/technologies/cloud-computing/quay">Product page →</a>
         </article>
       </div>
@@ -475,7 +574,7 @@
 
     <section>
       <h2>Architecture</h2>
-      <p class="muted wide">DevSpaces / Tekton → Nexus → Lightwell registry; GHA contingency → image registry → JBoss console.</p>
+      <p class="muted wide">DevSpaces / Tekton → Nexus → Lightwell registry; GHA → Quay (GHCR fallback) → JBoss console.</p>
       <img class="arch" src="lightwell-architecture.png" alt="Lightwell demo architecture diagram" />
     </section>
 
@@ -713,97 +812,192 @@
       </div>
     </section>
 
-    <section>
+    <section id="journey">
       <h2>Secure development journey</h2>
       <p class="muted">
         Lightwell remediates vulnerable Java deps; RHDA/TPA surfaces CVEs in the IDE;
-        Tekton builds through Nexus→Lightwell on OpenShift.
+        Tekton builds through Nexus→Lightwell on OpenShift. Images land on
+        <strong>Quay</strong> (<code>latest</code> / <code>contingency</code>); GHCR is the public fallback.
       </p>
-      <div class="journey-grid">
-        <figure class="journey-card">
-          <img src="journey/01-developer-sandbox.png" alt="Red Hat Developer Sandbox" />
-          <figcaption><strong>1. Developer Sandbox</strong> Start from the Red Hat Developer Sandbox.</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <img src="journey/02-openshift-topology.png" alt="OpenShift Topology with jboss-app and nexus" />
-          <figcaption><strong>2. Topology</strong> JBoss app connected to Nexus (Lightwell proxy).</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <img src="journey/04-nexus-lightwell-validated.png" alt="Nexus maven-lightwell-validated browse" />
-          <figcaption><strong>3. Nexus</strong> Proxy repo with Lightwell <code>.rhlw</code> artifacts.</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <img src="journey/05-lightwell-validated-registry.png" alt="Lightwell validated registry index" />
-          <figcaption><strong>4. Lightwell validated</strong> Upstream remediated content index.</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <img src="journey/06-tekton-pipelineruns.png" alt="Successful Tekton PipelineRun" />
-          <figcaption><strong>5. Pipelines</strong> Tekton build via Nexus → Lightwell SA on the remote.</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <img src="journey/07-jboss-app-home.png" alt="Lightwell Java Demo application home" />
-          <figcaption><strong>6. App home</strong> Runtime page showing Lightwell-resolved <code>commons-io</code>.</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <img src="journey/08-devspaces-rhda-plugins.png" alt="Dev Spaces RHDA and Java plugins" />
-          <figcaption><strong>7. Dev Spaces plugins</strong> Red Hat Dependency Analytics + Java pack; <code>analyze-cves</code> running.</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <img src="journey/08b-devspaces-devfile-commands.png" alt="Devfile Run Task analyze-cves" />
-          <figcaption><strong>7b. Devfile commands</strong> Run Task → <code>analyze-cves</code> for RHDA on <code>pom.xml</code>.</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <img src="journey/09b-pipelinerun-detail.png" alt="OpenShift Pipelines PipelineRun graph" />
-          <figcaption><strong>8. Pipelines</strong> Tekton graph: clone → maven → build-push → deploy (Succeeded).</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <img src="journey/09c-tekton-maven-nexus-commons-io.png" alt="Tekton maven task log Downloaded commons-io from Nexus maven-lightwell-validated" />
-          <figcaption><strong>8b. Maven → Nexus</strong> Task logs: <code>Downloaded from maven-lightwell-validated</code> — <code>commons-io:2.11.0.rhlw-00001</code> via <code>http://nexus:8081/…</code>.</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <img src="journey/09d-tekton-maven-nexus-jars.png" alt="Tekton maven task log downloading rhlw jars from Nexus" />
-          <figcaption><strong>8c. Lightwell jars</strong> Same task: <code>.rhlw</code> POMs/JARs resolved from Nexus (checksum warn is expected).</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <img src="journey/10-ghcr-image-tags.png" alt="GHCR demo-lightwell image tags" />
-          <figcaption><strong>9. Image registry</strong> GHCR tags <code>latest</code> / <code>contingency</code>.</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <img src="journey/11-artifacthub-charts.png" alt="Artifact Hub demo-lightwell Helm charts" />
-          <figcaption><strong>10. Artifact Hub</strong> Charts <code>jboss-app</code>, <code>nexus</code>, <code>devspaces-workspace</code>.</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <div style="padding: 2rem; text-align: center; background: var(--rh-color-surface-subtle); display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--rh-color-border); height: 260px;">
-            <p><strong>Artifact Hub UI showing CVE-2024-47554</strong></p>
-            <a class="btn btn-secondary" href="#proof">See Image Scan Proof ↓</a>
+      <div
+        class="journey-carousel"
+        id="journey-carousel"
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Secure development journey"
+        tabindex="0"
+      >
+        <div class="journey-viewport" id="journey-viewport">
+          <figure class="journey-slide is-active" data-slide="0" role="group" aria-roledescription="slide" aria-label="1 of 18">
+            <img src="journey/01-developer-sandbox.png" alt="Red Hat Developer Sandbox" />
+            <figcaption>
+              <span class="slide-num">Step 01</span>
+              <strong>Developer Sandbox</strong>
+              <span class="desc">Start from the Red Hat Developer Sandbox.</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="1" role="group" aria-roledescription="slide" aria-label="2 of 18" hidden>
+            <img src="journey/02-openshift-topology.png" alt="OpenShift Topology with jboss-app and nexus" />
+            <figcaption>
+              <span class="slide-num">Step 02</span>
+              <strong>Topology</strong>
+              <span class="desc">JBoss app connected to Nexus (Lightwell proxy).</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="2" role="group" aria-roledescription="slide" aria-label="3 of 18" hidden>
+            <img src="journey/04-nexus-lightwell-validated.png" alt="Nexus maven-lightwell-validated browse" />
+            <figcaption>
+              <span class="slide-num">Step 03</span>
+              <strong>Nexus</strong>
+              <span class="desc">Proxy repo with Lightwell <code>.rhlw</code> artifacts.</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="3" role="group" aria-roledescription="slide" aria-label="4 of 18" hidden>
+            <img src="journey/05-lightwell-validated-registry.png" alt="Lightwell validated registry index" />
+            <figcaption>
+              <span class="slide-num">Step 04</span>
+              <strong>Lightwell validated</strong>
+              <span class="desc">Upstream remediated content index.</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="4" role="group" aria-roledescription="slide" aria-label="5 of 18" hidden>
+            <img src="journey/06-tekton-pipelineruns.png" alt="Successful Tekton PipelineRun" />
+            <figcaption>
+              <span class="slide-num">Step 05</span>
+              <strong>Pipelines</strong>
+              <span class="desc">Tekton build via Nexus → Lightwell SA on the remote.</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="5" role="group" aria-roledescription="slide" aria-label="6 of 18" hidden>
+            <img src="journey/07-jboss-app-home.png" alt="Lightwell Java Demo application home" />
+            <figcaption>
+              <span class="slide-num">Step 06</span>
+              <strong>App home</strong>
+              <span class="desc">Runtime page showing Lightwell-resolved <code>commons-io</code>.</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="6" role="group" aria-roledescription="slide" aria-label="7 of 18" hidden>
+            <img src="journey/08-devspaces-rhda-plugins.png" alt="Dev Spaces RHDA and Java plugins" />
+            <figcaption>
+              <span class="slide-num">Step 07</span>
+              <strong>Dev Spaces plugins</strong>
+              <span class="desc">Red Hat Dependency Analytics + Java pack; <code>analyze-cves</code> running.</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="7" role="group" aria-roledescription="slide" aria-label="8 of 18" hidden>
+            <img src="journey/08b-devspaces-devfile-commands.png" alt="Devfile Run Task analyze-cves" />
+            <figcaption>
+              <span class="slide-num">Step 07b</span>
+              <strong>Devfile commands</strong>
+              <span class="desc">Run Task → <code>analyze-cves</code> for RHDA on <code>pom.xml</code>.</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="8" role="group" aria-roledescription="slide" aria-label="9 of 18" hidden>
+            <img src="journey/09b-pipelinerun-detail.png" alt="OpenShift Pipelines PipelineRun graph" />
+            <figcaption>
+              <span class="slide-num">Step 08</span>
+              <strong>Pipelines detail</strong>
+              <span class="desc">Tekton graph: clone → maven → build-push → deploy (Succeeded).</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="9" role="group" aria-roledescription="slide" aria-label="10 of 18" hidden>
+            <img src="journey/09c-tekton-maven-nexus-commons-io.png" alt="Tekton maven task log Downloaded commons-io from Nexus maven-lightwell-validated" />
+            <figcaption>
+              <span class="slide-num">Step 08b</span>
+              <strong>Maven → Nexus</strong>
+              <span class="desc">Task logs: <code>Downloaded from maven-lightwell-validated</code> — <code>commons-io:2.11.0.rhlw-00001</code>.</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="10" role="group" aria-roledescription="slide" aria-label="11 of 18" hidden>
+            <img src="journey/09d-tekton-maven-nexus-jars.png" alt="Tekton maven task log downloading rhlw jars from Nexus" />
+            <figcaption>
+              <span class="slide-num">Step 08c</span>
+              <strong>Lightwell jars</strong>
+              <span class="desc">Same task: <code>.rhlw</code> POMs/JARs resolved from Nexus (checksum warn is expected).</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="11" role="group" aria-roledescription="slide" aria-label="12 of 18" hidden>
+            <img
+              id="journey-quay-img"
+              src="journey/10-quay-tags.png"
+              alt="Quay demo-lightwell image tags latest and contingency"
+              data-fallback="journey/10-ghcr-image-tags.png"
+            />
+            <figcaption>
+              <span class="slide-num">Step 09</span>
+              <strong>Quay image tags</strong>
+              <span class="desc">Primary registry: <code>quay.io/…/demo-lightwell</code> tags <code>latest</code> / <code>contingency</code>. GHCR is the public fallback.</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="12" role="group" aria-roledescription="slide" aria-label="13 of 18" hidden>
+            <img src="journey/11-artifacthub-charts.png" alt="Artifact Hub demo-lightwell Helm charts" />
+            <figcaption>
+              <span class="slide-num">Step 10</span>
+              <strong>Artifact Hub</strong>
+              <span class="desc">Charts <code>jboss-app</code>, <code>nexus</code>, <code>devspaces-workspace</code>.</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="13" role="group" aria-roledescription="slide" aria-label="14 of 18" hidden>
+            <div class="slide-cta">
+              <p><strong>Artifact Hub UI showing CVE-2024-47554</strong></p>
+              <a class="btn btn-secondary" href="#proof">See Image Scan Proof ↓</a>
+            </div>
+            <figcaption>
+              <span class="slide-num">Step 10b</span>
+              <strong>Image scan summary</strong>
+              <span class="desc">Artifact Hub scans chart images (WildFly rating F) — not Lightwell Maven GAVs.</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="14" role="group" aria-roledescription="slide" aria-label="15 of 18" hidden>
+            <div class="slide-cta">
+              <p><strong>Stock commons-io CVE details</strong></p>
+              <a class="btn btn-secondary" href="#proof">See CVE Proof ↓</a>
+            </div>
+            <figcaption>
+              <span class="slide-num">Step 11</span>
+              <strong>Artifact Hub (image)</strong>
+              <span class="desc">Stock <code>commons-io:2.11.0</code> CVE in WildFly layers.</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="15" role="group" aria-roledescription="slide" aria-label="16 of 18" hidden>
+            <div class="slide-cta">
+              <p><strong>Full Dependency Analytics Report</strong></p>
+              <a class="btn btn-secondary" href="#rhda">See RHDA Report ↓</a>
+            </div>
+            <figcaption>
+              <span class="slide-num">Step 12</span>
+              <strong>RHDA report</strong>
+              <span class="desc">Full Dependency Analytics Report on <code>.rhlw</code> deps.</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="16" role="group" aria-roledescription="slide" aria-label="17 of 18" hidden>
+            <div class="slide-cta">
+              <p><strong>App Runtime Endpoint Status</strong></p>
+              <a class="btn btn-secondary" href="#access">See App Status ↓</a>
+            </div>
+            <figcaption>
+              <span class="slide-num">Step 13</span>
+              <strong>App home</strong>
+              <span class="desc">Runtime proof of Lightwell-resolved <code>commons-io</code>.</span>
+            </figcaption>
+          </figure>
+          <figure class="journey-slide" data-slide="17" role="group" aria-roledescription="slide" aria-label="18 of 18" hidden>
+            <img src="journey/15-hal-server-log.png" alt="HAL Management Console server.log showing ROOT.war deployed" />
+            <figcaption>
+              <span class="slide-num">Step 14</span>
+              <strong>HAL server.log</strong>
+              <span class="desc">Runtime → Log Files → <code>server.log</code>: <code>Deployed "ROOT.war"</code> and WildFly started.</span>
+            </figcaption>
+          </figure>
+        </div>
+        <div class="journey-controls">
+          <div class="journey-nav">
+            <button type="button" class="journey-btn" id="journey-prev" aria-label="Previous slide">← Prev</button>
+            <button type="button" class="journey-btn" id="journey-next" aria-label="Next slide">Next →</button>
           </div>
-          <figcaption><strong>10b. Image scan summary</strong> Artifact Hub scans chart images (WildFly rating F) — not Lightwell Maven GAVs.</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <div style="padding: 2rem; text-align: center; background: var(--rh-color-surface-subtle); display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--rh-color-border); height: 260px;">
-            <p><strong>Stock commons-io CVE details</strong></p>
-            <a class="btn btn-secondary" href="#proof">See CVE Proof ↓</a>
-          </div>
-          <figcaption><strong>11. Artifact Hub (image)</strong> Stock <code>commons-io:2.11.0</code> CVE in WildFly layers.</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <div style="padding: 2rem; text-align: center; background: var(--rh-color-surface-subtle); display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--rh-color-border); height: 260px;">
-            <p><strong>Full Dependency Analytics Report</strong></p>
-            <a class="btn btn-secondary" href="#rhda">See RHDA Report ↓</a>
-          </div>
-          <figcaption><strong>12. RHDA report</strong> Full Dependency Analytics Report on <code>.rhlw</code> deps.</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <div style="padding: 2rem; text-align: center; background: var(--rh-color-surface-subtle); display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--rh-color-border); height: 260px;">
-            <p><strong>App Runtime Endpoint Status</strong></p>
-            <a class="btn btn-secondary" href="#access">See App Status ↓</a>
-          </div>
-          <figcaption><strong>13. App home</strong> Runtime proof of Lightwell-resolved <code>commons-io</code>.</figcaption>
-        </figure>
-        <figure class="journey-card">
-          <img src="journey/15-hal-server-log.png" alt="HAL Management Console server.log showing ROOT.war deployed" />
-          <figcaption><strong>14. HAL server.log</strong> Runtime → Log Files → <code>server.log</code>: <code>Deployed "ROOT.war"</code> and WildFly started.</figcaption>
-        </figure>
+          <div class="journey-dots" id="journey-dots" role="tablist" aria-label="Slide picker"></div>
+          <span class="journey-status" id="journey-status" aria-live="polite">1 / 18</span>
+        </div>
       </div>
     </section>
 
@@ -901,5 +1095,96 @@
       <p>© 2026 demo-lightwell contributors · <a href="https://github.com/maximilianoPizarro/demo-lightwell">Source</a></p>
     </div>
   </footer>
+  <script>
+    (function () {
+      var root = document.getElementById("journey-carousel");
+      if (!root) return;
+      var slides = Array.prototype.slice.call(root.querySelectorAll(".journey-slide"));
+      var dotsWrap = document.getElementById("journey-dots");
+      var statusEl = document.getElementById("journey-status");
+      var prevBtn = document.getElementById("journey-prev");
+      var nextBtn = document.getElementById("journey-next");
+      var index = 0;
+      var timer = null;
+      var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var touchX = null;
+
+      var quayImg = document.getElementById("journey-quay-img");
+      if (quayImg && quayImg.dataset.fallback) {
+        quayImg.addEventListener("error", function () {
+          if (quayImg.dataset.fallbackUsed) return;
+          quayImg.dataset.fallbackUsed = "1";
+          quayImg.src = quayImg.dataset.fallback;
+          quayImg.alt = "GHCR demo-lightwell tags (Quay screenshot pending — public fallback)";
+        });
+      }
+
+      slides.forEach(function (_, i) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "journey-dot";
+        b.setAttribute("role", "tab");
+        b.setAttribute("aria-label", "Go to slide " + (i + 1));
+        b.addEventListener("click", function () { go(i, true); });
+        dotsWrap.appendChild(b);
+      });
+
+      function go(n, user) {
+        index = (n + slides.length) % slides.length;
+        slides.forEach(function (slide, i) {
+          var on = i === index;
+          slide.classList.toggle("is-active", on);
+          if (on) slide.removeAttribute("hidden");
+          else slide.setAttribute("hidden", "");
+          slide.setAttribute("aria-hidden", on ? "false" : "true");
+        });
+        Array.prototype.forEach.call(dotsWrap.children, function (dot, i) {
+          if (i === index) dot.setAttribute("aria-current", "true");
+          else dot.removeAttribute("aria-current");
+        });
+        statusEl.textContent = (index + 1) + " / " + slides.length;
+        if (user) restart();
+      }
+
+      function next() { go(index + 1, false); }
+      function prev() { go(index - 1, false); }
+
+      function restart() {
+        stop();
+        if (reduced) return;
+        timer = window.setInterval(next, 7000);
+      }
+      function stop() {
+        if (timer) { window.clearInterval(timer); timer = null; }
+      }
+
+      prevBtn.addEventListener("click", function () { go(index - 1, true); });
+      nextBtn.addEventListener("click", function () { go(index + 1, true); });
+      root.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight") { e.preventDefault(); go(index + 1, true); }
+        if (e.key === "ArrowLeft") { e.preventDefault(); go(index - 1, true); }
+      });
+      root.addEventListener("mouseenter", stop);
+      root.addEventListener("mouseleave", restart);
+      root.addEventListener("focusin", stop);
+      root.addEventListener("focusout", function (e) {
+        if (!root.contains(e.relatedTarget)) restart();
+      });
+      root.addEventListener("touchstart", function (e) {
+        touchX = e.changedTouches[0].clientX;
+      }, { passive: true });
+      root.addEventListener("touchend", function (e) {
+        if (touchX == null) return;
+        var dx = e.changedTouches[0].clientX - touchX;
+        touchX = null;
+        if (Math.abs(dx) < 40) return;
+        if (dx < 0) go(index + 1, true);
+        else go(index - 1, true);
+      }, { passive: true });
+
+      go(0, false);
+      restart();
+    })();
+  </script>
 </body>
 </html>

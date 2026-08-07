@@ -37,7 +37,7 @@ entries:
           url: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/lightwell-architecture.png
     apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-08-07T20:34:34.215291796Z"
+    created: "2026-08-07T21:11:30.324276066Z"
     dependencies:
     - name: nexus
       repository: file://../nexus
@@ -48,7 +48,7 @@ entries:
     description: Umbrella chart for the Lightwell Java demo — secrets, Nexus (Lightwell
       proxy), JBoss/WildFly, Tekton PipelineRun to OpenShift internal registry (optional
       Quay), and DevWorkspace.
-    digest: b3b5bde4da8a898767ad12a2e42254ba6840a97ec7c1d23afcb6de41c30e8d44
+    digest: 2312a4fa9dc940cc6c3d5d29699acb84bd32959ffc4c19d4d02199d452073f6b
     home: https://maximilianopizarro.github.io/demo-lightwell/
     icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/lightwell_logo_light.svg
     keywords:
@@ -89,10 +89,10 @@ entries:
       artifacthub.io/prerelease: "false"
     apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-08-07T20:34:34.21559797Z"
+    created: "2026-08-07T21:11:30.324566268Z"
     description: Helm chart to deploy a DevWorkspace CR for the Lightwell demo, enabling
       GitOps/Helm-based provisioning of OpenShift Dev Spaces environments.
-    digest: c76d8b8046760f966a22d2d4f0c9349c549b2d437dc63e1371ea9e94831cb15d
+    digest: c9617494d8ee2bd02d3e80513a5ff1f3cdefbeeef0ee59183d5707eaf65aa24c
     home: https://maximilianopizarro.github.io/demo-lightwell/
     icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/openshift-dev-spaces.svg
     keywords:
@@ -147,10 +147,10 @@ entries:
           url: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/journey/13-rhda-dependency-analytics-report.png
     apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-08-07T20:34:34.21598478Z"
+    created: "2026-08-07T21:11:30.324954554Z"
     description: JBoss/WildFly deployment for the Lightwell Java demo WAR (app + management
       console Routes) on OpenShift.
-    digest: bf92e1af695b3694f93be79bcbcc7428f46374e75bb2916fbc7f7427c3177970
+    digest: 4662b1993003d100750e9285a7ce57bd37cd9733ee17a3fbea996fb3b232fd33
     home: https://maximilianopizarro.github.io/demo-lightwell/
     icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/lightwell_logo_light.svg
     keywords:
@@ -200,11 +200,11 @@ entries:
           url: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/journey/04-nexus-lightwell-validated.png
     apiVersion: v2
     appVersion: 3.70.1
-    created: "2026-08-07T20:34:34.216417954Z"
+    created: "2026-08-07T21:11:30.325405696Z"
     description: Lightweight Nexus Repository OSS (single pod + PVC) proxying Red
       Hat Lightwell Maven validated/remediated tiers for the demo-lightwell journey
       on OpenShift Dev Spaces.
-    digest: a91312a870b0a5208e049c225b097ab9b36d21cdca128d15b2d63a6e6f86fc48
+    digest: 745eef760d28a15afb914a96ac015f98bfdf853009a2fa07a429dc7028843b3a
     home: https://maximilianopizarro.github.io/demo-lightwell/
     icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/nexus.png
     keywords:
@@ -224,4 +224,4 @@ entries:
     urls:
     - https://maximilianopizarro.github.io/demo-lightwell/charts/nexus-0.1.1.tgz
     version: 0.1.1
-generated: "2026-08-07T20:34:34.213784768Z"
+generated: "2026-08-07T21:11:30.322744915Z"

@@ -7,10 +7,10 @@ entries:
       artifacthub.io/prerelease: "false"
     apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-08-07T15:07:43.6625663-03:00"
+    created: "2026-08-07T18:07:54.341816185Z"
     description: Helm chart to deploy a DevWorkspace CR for the Lightwell demo, enabling
       GitOps/Helm-based provisioning of OpenShift Dev Spaces environments.
-    digest: 320962dfe04ddd568483b6be5e8efeccb1afa669d2bec28574b2803decae1791
+    digest: a02e7893c0fac5d7412ecfbcf50bbc445c3b1fa407b76588860ca9abd8b1db9f
     home: https://maximilianopizarro.github.io/demo-lightwell/
     icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/openshift-dev-spaces.svg
     keywords:
@@ -53,10 +53,10 @@ entries:
           url: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/lightwell-architecture.png
     apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-08-07T15:07:43.6630854-03:00"
+    created: "2026-08-07T18:07:54.342188351Z"
     description: JBoss/WildFly deployment for the Lightwell Java demo WAR (app + management
       console Routes) on OpenShift.
-    digest: 3572cb41095048eed75e78bcf05e0a10af6464f18d3e5187fccf4a74e2f2e10f
+    digest: 3a92864bbae9589d78625f5ccfb0c13c3dcf8afcdfa2b0b7453ab63f7028363e
     home: https://maximilianopizarro.github.io/demo-lightwell/
     icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/demo-lightwell-icon.png
     keywords:
@@ -104,11 +104,11 @@ entries:
           url: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/lightwell-architecture.png
     apiVersion: v2
     appVersion: 3.70.1
-    created: "2026-08-07T15:07:43.6636106-03:00"
+    created: "2026-08-07T18:07:54.342600483Z"
     description: Lightweight Nexus Repository OSS (single pod + PVC) proxying Red
       Hat Lightwell Maven validated/remediated tiers for the demo-lightwell journey
       on OpenShift Dev Spaces.
-    digest: 885767f36fc0284ad06eefcc34b42163ce50b23fa8868634066a7f5f8a2c2258
+    digest: 4556db995a61849501dbbf3436bec3884bc611d708b1b84fcb4368d3bcdb79c6
     home: https://maximilianopizarro.github.io/demo-lightwell/
     icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/nexus.png
     keywords:
@@ -128,4 +128,4 @@ entries:
     urls:
     - https://maximilianopizarro.github.io/demo-lightwell/charts/nexus-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-07T15:07:43.662048-03:00"
+generated: "2026-08-07T18:07:54.341466541Z"

@@ -126,18 +126,41 @@ jobs:
           OWNER_LC="$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
           REPO_LC="$(echo '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')"
           GHCR="ghcr.io/${OWNER_LC}/${REPO_LC}"
-          # Override with QUAY_IMAGE secret if set; else quay.io/maximilianopizarro/demo-lightwell
           QUAY="${QUAY_IMAGE_SECRET:-${QUAY_REGISTRY}/${QUAY_NAMESPACE}/${IMAGE_NAME}}"
+          QUAY_PATH="${QUAY#*/}"   # namespace/name (strip registry)
+          QUAY_NS="${QUAY_PATH%%/*}"
+          QUAY_REPO="${QUAY_PATH#*/}"
           {
             echo "ghcr=${GHCR}"
             echo "ghcr_contingency=${GHCR}:contingency"
             echo "ghcr_sha=${GHCR}:sha-${SHORT_SHA}"
             echo "ghcr_latest=${GHCR}:latest"
             echo "quay=${QUAY}"
+            echo "quay_ns=${QUAY_NS}"
+            echo "quay_repo=${QUAY_REPO}"
             echo "quay_contingency=${QUAY}:contingency"
             echo "quay_sha=${QUAY}:sha-${SHORT_SHA}"
             echo "quay_latest=${QUAY}:latest"
           } >> "$GITHUB_OUTPUT"
+
+      # GHCR first so a Quay permission issue never blocks the public release image.
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push to GHCR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Containerfile.runtime
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.ghcr_contingency }}
+            ${{ steps.meta.outputs.ghcr_sha }}
+            ${{ steps.meta.outputs.ghcr_latest }}
 
       - name: Login to Quay.io
         uses: docker/login-action@v3
@@ -145,6 +168,41 @@ jobs:
           registry: ${{ env.QUAY_REGISTRY }}
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Ensure Quay repository exists
+        env:
+          QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+          QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
+          QUAY_NS: ${{ steps.meta.outputs.quay_ns }}
+          QUAY_REPO: ${{ steps.meta.outputs.quay_repo }}
+        run: |
+          set -euo pipefail
+          AUTH=(-u "${QUAY_USERNAME}:${QUAY_PASSWORD}")
+          CODE=$(curl -sS -o /tmp/quay-repo.json -w "%{http_code}" \
+            "${AUTH[@]}" "https://quay.io/api/v1/repository/${QUAY_NS}/${QUAY_REPO}" || true)
+          echo "GET repository HTTP ${CODE}"
+          if [ "${CODE}" = "200" ]; then
+            echo "Quay repository ${QUAY_NS}/${QUAY_REPO} already exists"
+          else
+            echo "Creating Quay repository ${QUAY_NS}/${QUAY_REPO}..."
+            HTTP=$(curl -sS -o /tmp/quay-create.json -w "%{http_code}" \
+              "${AUTH[@]}" -H "Content-Type: application/json" \
+              -d "{\"repository\":\"${QUAY_REPO}\",\"visibility\":\"public\",\"description\":\"Lightwell Java demo\",\"namespace\":\"${QUAY_NS}\"}" \
+              "https://quay.io/api/v1/repository" || true)
+            echo "POST repository HTTP ${HTTP}"
+            cat /tmp/quay-create.json || true
+            if [ "${HTTP}" != "201" ] && [ "${HTTP}" != "200" ]; then
+              # Repo may already exist under a race, or robot lacks create — still try write grant + push.
+              echo "Create returned ${HTTP}; continuing (push will confirm Write)."
+            fi
+          fi
+          # Ensure the robot used for docker login has write on the target repo.
+          HTTP=$(curl -sS -o /tmp/quay-perm.json -w "%{http_code}" \
+            "${AUTH[@]}" -X PUT -H "Content-Type: application/json" \
+            -d '{"role":"write"}' \
+            "https://quay.io/api/v1/repository/${QUAY_NS}/${QUAY_REPO}/permissions/user/${QUAY_USERNAME}" || true)
+          echo "PUT robot write permission HTTP ${HTTP}"
+          cat /tmp/quay-perm.json || true
 
       - name: Build and push to Quay
         id: quay_push
@@ -158,28 +216,15 @@ jobs:
             ${{ steps.meta.outputs.quay_contingency }}
             ${{ steps.meta.outputs.quay_sha }}
 
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push to GHCR (public fallback)
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Containerfile.runtime
-          push: true
-          tags: |
-            ${{ steps.meta.outputs.ghcr_contingency }}
-            ${{ steps.meta.outputs.ghcr_sha }}
-            ${{ steps.meta.outputs.ghcr_latest }}
-
       - name: Release summary
+        if: always()
         run: |
           {
             echo "## Release images"
-            echo "- **Quay:** \`${{ steps.meta.outputs.quay_contingency }}\` (also \`latest\`, \`sha-…\`)"
             echo "- **GHCR:** \`${{ steps.meta.outputs.ghcr_contingency }}\`"
+            if [ "${{ steps.quay_push.outcome }}" = "success" ]; then
+              echo "- **Quay:** \`${{ steps.meta.outputs.quay_contingency }}\` (also \`latest\`, \`sha-…\`)"
+            else
+              echo "- **Quay:** push did not succeed for \`${{ steps.meta.outputs.quay }}\` — check robot Write on that repository (secrets \`QUAY_USERNAME\` / \`QUAY_PASSWORD\` / \`QUAY_IMAGE\`)."
+            fi
           } >> "$GITHUB_STEP_SUMMARY"

@@ -20,7 +20,8 @@
       --rh-color-border: #d2d2d2;
       --rh-font-display: "Red Hat Display", "RedHatDisplay", sans-serif;
       --rh-font-text: "Red Hat Text", "RedHatText", sans-serif;
-      --max: 72rem;
+      --max: 88rem;
+      --pad-x: clamp(1rem, 2.5vw, 1.75rem);
     }
     * { box-sizing: border-box; }
     body {
@@ -36,55 +37,155 @@
     a:hover { color: var(--rh-color-brand-red-dark); }
     header {
       border-bottom: 1px solid var(--rh-color-border);
-      background: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.94);
       backdrop-filter: blur(8px);
-      position: sticky; top: 0; z-index: 10;
+      position: sticky; top: 0; z-index: 20;
     }
     .bar {
       max-width: var(--max);
       margin: 0 auto;
-      padding: 0.85rem 1.25rem;
+      padding: 0.65rem var(--pad-x);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
+      gap: 1.25rem;
     }
-    .bar nav { display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.95rem; }
-    .bar nav a { color: var(--rh-color-text-primary); text-decoration: none; font-weight: 500; }
+    .bar-brand { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+    .rh-mark { height: 26px; width: auto; display: block; }
+    .bar .nav-toggle { margin-left: auto; }
+    .nav-toggle {
+      display: none;
+      appearance: none;
+      border: 1px solid var(--rh-color-border);
+      background: #fff;
+      border-radius: 3px;
+      width: 2.5rem;
+      height: 2.5rem;
+      padding: 0;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .nav-toggle span {
+      display: block;
+      width: 1.1rem;
+      height: 2px;
+      background: var(--rh-color-text-primary);
+      border-radius: 1px;
+    }
+    .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+    .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    .nav-toggle span { transition: transform .15s ease, opacity .15s ease; }
+    .bar nav {
+      display: flex;
+      align-items: center;
+      flex: 1 1 auto;
+      flex-wrap: nowrap;
+      gap: 0.85rem;
+      font-size: 0.82rem;
+      min-width: 0;
+    }
+    .bar nav a {
+      color: var(--rh-color-text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      white-space: nowrap;
+    }
     .bar nav a:hover { color: var(--rh-color-brand-red); }
-    .rh-mark { height: 28px; }
-    main { max-width: var(--max); margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+    .nav-primary {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.15rem 0.85rem;
+      min-width: 0;
+    }
+    .nav-more-panel { display: none; }
+    .nav-more { position: relative; flex-shrink: 0; }
+    .nav-more > summary {
+      list-style: none;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--rh-color-text-primary);
+      white-space: nowrap;
+      padding: 0.2rem 0;
+    }
+    .nav-more > summary::-webkit-details-marker { display: none; }
+    .nav-more > summary::after { content: " ▾"; font-size: 0.75em; color: var(--rh-color-text-secondary); }
+    .nav-more[open] > summary { color: var(--rh-color-brand-red); }
+    .nav-more-panel {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 0.45rem);
+      min-width: 12.5rem;
+      background: #fff;
+      border: 1px solid var(--rh-color-border);
+      border-radius: 6px;
+      box-shadow: 0 10px 28px rgba(21,21,21,.12);
+      padding: 0.4rem;
+      z-index: 30;
+    }
+    .nav-more[open] > .nav-more-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+    .nav-more-panel a {
+      padding: 0.45rem 0.65rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .nav-more-panel a:hover { background: var(--rh-color-surface-subtle); }
+    .nav-ext {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding-left: 0.85rem;
+      margin-left: auto;
+      border-left: 1px solid var(--rh-color-border);
+      flex-shrink: 0;
+    }
+    main { max-width: var(--max); margin: 0 auto; padding: 2rem var(--pad-x) 3.5rem; }
     .hero {
       display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 2rem;
-      align-items: center;
-      margin-bottom: 3rem;
+      grid-template-columns: minmax(0, 1.45fr) minmax(17rem, 0.9fr);
+      gap: clamp(1.25rem, 3vw, 2.25rem);
+      align-items: stretch;
+      margin-bottom: 2.5rem;
     }
-    @media (max-width: 860px) {
-      .hero { grid-template-columns: 1fr; }
+    .hero-copy { min-width: 0; display: flex; flex-direction: column; }
+    .hero-aside {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-width: 0;
     }
     .hero h1 {
       font-family: var(--rh-font-display);
-      font-size: clamp(2rem, 4vw, 3rem);
-      line-height: 1.1;
-      margin: 0.5rem 0 0.4rem;
+      font-size: clamp(2rem, 3.6vw, 3.1rem);
+      line-height: 1.08;
+      margin: 0.4rem 0 0.35rem;
       font-weight: 700;
+      max-width: 22ch;
     }
     .hero .byline {
-      margin: 0 0 1.25rem;
-      font-size: 1rem;
+      margin: 0 0 1rem;
+      font-size: 0.98rem;
       color: var(--rh-color-text-secondary);
-      max-width: 40rem;
+      max-width: 46rem;
       line-height: 1.4;
     }
     .hero .byline a { font-weight: 600; }
     .hero p.lead {
-      font-size: 1.125rem;
+      font-size: 1.1rem;
       color: var(--rh-color-text-secondary);
-      max-width: 38rem;
-      margin: 0 0 1.5rem;
+      max-width: 48rem;
+      margin: 0 0 1.1rem;
+      line-height: 1.5;
     }
+    .hero .muted { max-width: 48rem; margin-bottom: 1.25rem; }
     .eyebrow {
       display: inline-flex;
       align-items: center;
@@ -98,19 +199,22 @@
     .cta {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      align-items: center;
+      gap: 0.65rem;
+      margin-top: auto;
     }
     .btn {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.7rem 1.1rem;
+      padding: 0.65rem 1rem;
       border-radius: 3px;
       font-family: var(--rh-font-display);
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       border: 1px solid transparent;
       text-decoration: none;
+      white-space: nowrap;
     }
     .btn-primary {
       background: var(--rh-color-brand-red);
@@ -126,21 +230,96 @@
       background: #fff;
       border: 1px solid var(--rh-color-border);
       border-radius: 8px;
-      padding: 1.5rem;
+      padding: 1.25rem 1.35rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1rem;
+      justify-content: center;
+      gap: 0.75rem;
       box-shadow: 0 8px 24px rgba(21,21,21,.06);
+      flex: 0 0 auto;
+      min-height: 9.5rem;
     }
-    .logo-card img.lw { width: min(100%, 320px); height: auto; }
+    .logo-card img.lw { width: min(100%, 280px); height: auto; display: block; }
+    .hero-aside .callout {
+      flex: 1 1 auto;
+      max-width: none;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .hero-aside .callout ul { flex: 1 1 auto; }
+    .hero-aside .callout ul {
+      margin: 0.5rem 0 0;
+      padding-left: 1.15rem;
+      color: var(--rh-color-text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+    .hero-aside .callout li + li { margin-top: 0.4rem; }
+    @media (max-width: 1180px) {
+      .bar nav { gap: 0.65rem; font-size: 0.78rem; }
+      .nav-primary { gap: 0.1rem 0.65rem; }
+      .nav-ext { gap: 0.65rem; }
+    }
+    @media (max-width: 960px) {
+      .nav-toggle { display: inline-flex; }
+      .bar { flex-wrap: wrap; }
+      .bar nav {
+        display: none;
+        width: 100%;
+        flex: 1 0 100%;
+        flex-direction: column;
+        align-items: stretch;
+        flex-wrap: nowrap;
+        gap: 0.15rem;
+        padding: 0.35rem 0 0.5rem;
+        border-top: 1px solid var(--rh-color-border);
+        font-size: 0.95rem;
+      }
+      .bar nav.is-open { display: flex; }
+      .nav-primary, .nav-ext {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.1rem;
+      }
+      .nav-more { border: 0; width: 100%; }
+      .nav-more > summary { display: none; }
+      details.nav-more > .nav-more-panel,
+      details.nav-more:not([open]) > .nav-more-panel {
+        display: flex !important;
+        position: static;
+        border: 0;
+        box-shadow: none;
+        padding: 0;
+        min-width: 0;
+        flex-direction: column;
+        gap: 0.1rem;
+      }
+      .nav-ext {
+        border-left: 0;
+        border-top: 1px solid var(--rh-color-border);
+        margin: 0.35rem 0 0;
+        padding: 0.45rem 0 0;
+      }
+      .bar nav a { padding: 0.55rem 0.15rem; white-space: normal; }
+      .hero { grid-template-columns: 1fr; }
+      .hero h1 { max-width: none; }
+      .cta .btn { flex: 1 1 auto; justify-content: center; }
+    }
+    @media (max-width: 560px) {
+      .cta .btn { width: 100%; }
+      .btn-devspaces { width: 100%; justify-content: center; }
+      .btn-devspaces img { height: 34px; }
+    }
     section { margin: 2.75rem 0; }
     h2 {
       font-family: var(--rh-font-display);
       font-size: 1.6rem;
       margin: 0 0 0.75rem;
     }
-    .muted { color: var(--rh-color-text-secondary); margin: 0 0 1.25rem; max-width: 40rem; }
+    .muted { color: var(--rh-color-text-secondary); margin: 0 0 1.25rem; max-width: 54rem; }
     .stack {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -172,7 +351,8 @@
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
-      max-width: 64rem;
+      max-width: none;
+      width: 100%;
     }
     .journey-carousel:focus { outline: 2px solid var(--rh-color-brand-red); outline-offset: 3px; }
     .journey-carousel.is-fullscreen {
@@ -572,29 +752,43 @@
 <body>
   <header>
     <div class="bar">
-      <a href="./" aria-label="Home">
-        <img class="rh-mark" src="brand/redhat-logo-on-light.svg" alt="Red Hat" />
-      </a>
-      <nav>
-        <a href="#journey">Journey</a>
-        <a href="#glossary">Glossary</a>
-        <a href="#nexus-tekton">Nexus + Tekton</a>
-        <a href="#run">Run</a>
-        <a href="#access">Access</a>
-        <a href="#rhda">RHDA report</a>
-        <a href="#proof">CVE proof</a>
-        <a href="#charts">Charts</a>
-        <a href="#day2">Day-2 (Prod)</a>
-        <a href="#beyond">Beyond the demo</a>
-        <a href="https://artifacthub.io/packages/search?repo=demo-lightwell">Artifact Hub</a>
-        <a href="https://github.com/maximilianoPizarro/demo-lightwell">GitHub</a>
+      <div class="bar-brand">
+        <a href="./" aria-label="Home">
+          <img class="rh-mark" src="brand/redhat-logo-on-light.svg" alt="Red Hat" />
+        </a>
+      </div>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="site-nav" aria-label="Page sections">
+        <div class="nav-primary">
+          <a href="#journey">Journey</a>
+          <a href="#run">Run</a>
+          <a href="#access">Access</a>
+          <a href="#charts">Charts</a>
+          <a href="#proof">CVE proof</a>
+        </div>
+        <details class="nav-more" id="nav-more">
+          <summary>More</summary>
+          <div class="nav-more-panel">
+            <a href="#glossary">Glossary</a>
+            <a href="#nexus-tekton">Nexus + Tekton</a>
+            <a href="#rhda">RHDA report</a>
+            <a href="#day2">Day-2 (Prod)</a>
+            <a href="#beyond">Beyond the demo</a>
+          </div>
+        </details>
+        <div class="nav-ext">
+          <a href="https://artifacthub.io/packages/search?repo=demo-lightwell">Artifact Hub</a>
+          <a href="https://github.com/maximilianoPizarro/demo-lightwell">GitHub</a>
+        </div>
       </nav>
     </div>
   </header>
 
   <main>
     <section class="hero">
-      <div>
+      <div class="hero-copy">
         <div class="eyebrow">Red Hat Lightwell Network · Java demo</div>
         <h1>Secure legacy Java deps on OpenShift Dev Spaces</h1>
         <p class="byline">
@@ -603,14 +797,6 @@
         <p class="lead">
           This demo shows how to use <strong>Red Hat Lightwell</strong> to resolve vulnerable Java dependencies in a legacy app, transparently displaying CVE status without pretending they magically disappear.
         </p>
-        <div class="callout" style="margin-bottom: 1.5rem; max-width: 38rem;">
-          <p><strong>Executive Summary (TL;DR)</strong></p>
-          <ul style="margin:0; padding-left: 1.25rem; color: var(--rh-color-text-secondary);">
-            <li><strong>What is this?</strong> An end-to-end sandbox demo of securing a Java (WildFly) app's supply chain using Lightwell, Nexus, and OpenShift Pipelines.</li>
-            <li><strong>For whom?</strong> Architects and DevSecOps exploring how Lightwell's remediated packages interact with existing IDE scanners (RHDA) and deployment workflows.</li>
-            <li><strong>What will you see?</strong> The contrast between two signals: an image scan flagging stock CVEs, versus the app safely building with Lightwell <code>.rhlw</code> coordinates via Nexus.</li>
-          </ul>
-        </div>
         <p class="muted">
           Under the hood: Artifact Hub flags stock <code>commons-io</code> inside the WildFly
           <a href="https://artifacthub.io/packages/helm/demo-lightwell/jboss-app?modal=security-report">image scan</a>;
@@ -635,13 +821,23 @@
           <img alt="CVE proof" src="https://img.shields.io/badge/CVE--2024--47554-stock%20vs%20.rhlw-c9190b?style=flat-square" />
         </div>
       </div>
-      <div class="logo-card">
-        <img class="lw" src="brand/lightwell_logo_light.svg" alt="Official Red Hat Lightwell logo" />
-        <p class="muted" style="margin:0;text-align:center;font-size:0.85rem;">
-          Official Lightwell mark from
-          <a href="https://www.redhat.com/en/lightwell">redhat.com/en/lightwell</a>
-        </p>
-      </div>
+      <aside class="hero-aside">
+        <div class="logo-card">
+          <img class="lw" src="brand/lightwell_logo_light.svg" alt="Official Red Hat Lightwell logo" />
+          <p class="muted" style="margin:0;text-align:center;font-size:0.85rem;">
+            Official Lightwell mark from
+            <a href="https://www.redhat.com/en/lightwell">redhat.com/en/lightwell</a>
+          </p>
+        </div>
+        <div class="callout">
+          <p><strong>Executive Summary (TL;DR)</strong></p>
+          <ul>
+            <li><strong>What is this?</strong> An end-to-end sandbox demo of securing a Java (WildFly) app's supply chain using Lightwell, Nexus, and OpenShift Pipelines.</li>
+            <li><strong>For whom?</strong> Architects and DevSecOps exploring how Lightwell's remediated packages interact with existing IDE scanners (RHDA) and deployment workflows.</li>
+            <li><strong>What will you see?</strong> The contrast between two signals: an image scan flagging stock CVEs, versus the app safely building with Lightwell <code>.rhlw</code> coordinates via Nexus.</li>
+          </ul>
+        </div>
+      </aside>
     </section>
 
     <section id="journey">
@@ -1308,6 +1504,33 @@ Contrast — GitHub Actions contingency path (no Nexus):
     </div>
   </footer>
   <script>
+    (function () {
+      var toggle = document.getElementById("nav-toggle");
+      var nav = document.getElementById("site-nav");
+      var more = document.getElementById("nav-more");
+      if (toggle && nav) {
+        toggle.addEventListener("click", function () {
+          var open = !nav.classList.contains("is-open");
+          nav.classList.toggle("is-open", open);
+          toggle.setAttribute("aria-expanded", open ? "true" : "false");
+          toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+          if (more) more.open = open;
+        });
+        nav.addEventListener("click", function (e) {
+          var a = e.target.closest("a");
+          if (!a || !nav.classList.contains("is-open")) return;
+          nav.classList.remove("is-open");
+          toggle.setAttribute("aria-expanded", "false");
+          toggle.setAttribute("aria-label", "Open menu");
+        });
+      }
+      document.addEventListener("click", function (e) {
+        if (!more || !more.open) return;
+        if (more.contains(e.target)) return;
+        if (window.matchMedia("(max-width: 960px)").matches) return;
+        more.open = false;
+      });
+    })();
     (function () {
       var root = document.getElementById("journey-carousel");
       if (!root) return;

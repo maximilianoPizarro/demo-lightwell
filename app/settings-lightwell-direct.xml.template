@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Maven settings for direct Lightwell access (no Nexus).
+  Placeholders replaced by CI / scripts:
+    __LIGHTWELL_SERVER_ID__  e.g. lightwell-validated | lightwell-remediated
+    __LIGHTWELL_URL__        repository URL
+    __LIGHTWELL_USERNAME__   SA username (XXXXXXX|name)
+    __LIGHTWELL_PASSWORD__   SA token
+-->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
+  <servers>
+    <server>
+      <id>__LIGHTWELL_SERVER_ID__</id>
+      <username>__LIGHTWELL_USERNAME__</username>
+      <password>__LIGHTWELL_PASSWORD__</password>
+    </server>
+  </servers>
+  <profiles>
+    <profile>
+      <id>__LIGHTWELL_SERVER_ID__</id>
+      <repositories>
+        <repository>
+          <id>__LIGHTWELL_SERVER_ID__</id>
+          <name>Lightwell Network</name>
+          <url>__LIGHTWELL_URL__</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+        <repository>
+          <id>central</id>
+          <url>https://repo.maven.apache.org/maven2</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>https://repo.maven.apache.org/maven2</url>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>__LIGHTWELL_SERVER_ID__</activeProfile>
+  </activeProfiles>
+</settings>

@@ -1,0 +1,17 @@
+target/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.env
+*.token
+settings-lightwell-direct.xml
+**/settings.xml
+!app/settings-lightwell-direct.xml.template
+!k8s/**/*.yaml
+kubeconfig
+.oc/
+*.war
+.DS_Store
+local/

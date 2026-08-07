@@ -1,0 +1,6 @@
+apiVersion: v2
+name: nexus
+description: Lightweight Nexus Repository OSS (single pod + PVC) for Lightwell demo
+type: application
+version: 0.1.0
+appVersion: "3.70.1"

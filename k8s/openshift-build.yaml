@@ -1,0 +1,37 @@
+# Quay robot `maximilianopizarro+quaydevfile` currently receives an empty
+# actions list for this repository (no push). Create the repo in the Quay UI
+# and grant the robot Write, then re-run the contingency workflow / podman push.
+#
+# Until then, use an in-cluster OpenShift build (image stream demo-lightwell).
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: demo-lightwell
+  labels:
+    app.kubernetes.io/part-of: demo-lightwell
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: demo-lightwell
+  labels:
+    app.kubernetes.io/part-of: demo-lightwell
+spec:
+  source:
+    type: Binary
+    binary: {}
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Containerfile.runtime
+  output:
+    to:
+      kind: ImageStreamTag
+      name: demo-lightwell:contingency
+  resources:
+    limits:
+      memory: 1Gi
+      cpu: "1"
+    requests:
+      memory: 256Mi
+      cpu: 100m

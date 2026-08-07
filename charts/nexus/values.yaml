@@ -1,0 +1,53 @@
+replicaCount: 1
+
+image:
+  repository: sonatype/nexus3
+  tag: "3.70.1"
+  pullPolicy: IfNotPresent
+
+nameOverride: nexus
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 8081
+
+route:
+  enabled: true
+  host: ""
+
+persistence:
+  enabled: true
+  size: 2Gi
+  storageClass: ""
+  accessMode: ReadWriteOnce
+
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 100m
+  limits:
+    memory: 2Gi
+    cpu: "1"
+
+jvm:
+  # Demo-tuned heap for Developer Sandbox
+  params: "-Xms512m -Xmx1536m -XX:MaxDirectMemorySize=512m -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
+
+nexusAdmin:
+  # Initial admin password written to secret; change after first login in real envs
+  password: "admin123"
+
+lightwell:
+  # validated | remediated
+  tier: validated
+  # Demo public validated index (switch to product URLs for subscription)
+  remoteUrl: "https://packages.redhat.com/api/pulp-content/public-lightwell-demo/java/validated/"
+  repositoryName: maven-lightwell-validated
+  # Credentials come from existing Secret lightwell-sa (keys: username, token)
+  existingSecret: lightwell-sa
+  layoutPolicy: STRICT
+
+configureJob:
+  enabled: true
+  image: registry.access.redhat.com/ubi9/ubi:latest

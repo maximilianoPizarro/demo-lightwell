@@ -1,0 +1,38 @@
+replicaCount: 1
+
+image:
+  repository: quay.io/maximilianopizarro/demo-lightwell
+  # contingency = GHA fallback until Tekton publishes :latest
+  tag: contingency
+  pullPolicy: Always
+  pullSecrets:
+    - quay-pull-secret
+
+nameOverride: jboss-app
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 8080
+  managementPort: 9990
+
+route:
+  enabled: true
+  host: ""
+  management:
+    enabled: true
+    host: ""
+
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 50m
+  limits:
+    memory: 768Mi
+    cpu: 500m
+
+admin:
+  existingSecret: jboss-admin
+  # keys: username, password
+
+env: []

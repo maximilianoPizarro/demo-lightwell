@@ -1,0 +1,10 @@
+# Simpler multi-stage used by GitHub Actions (WAR pre-built in previous job)
+ARG RUNTIME_IMAGE=quay.io/wildfly/wildfly:27.0.1.Final-jdk17
+FROM ${RUNTIME_IMAGE}
+USER root
+COPY app/target/demo-lightwell.war /opt/jboss/wildfly/standalone/deployments/ROOT.war
+RUN /opt/jboss/wildfly/bin/add-user.sh -u admin -p 'Admin#123' -g ManagementRealm || true \
+ && sed -i 's/jboss.bind.address.management:127.0.0.1/jboss.bind.address.management:0.0.0.0/g' /opt/jboss/wildfly/standalone/configuration/standalone.xml || true
+USER jboss
+EXPOSE 8080 9990
+CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]

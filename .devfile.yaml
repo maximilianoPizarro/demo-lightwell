@@ -1,0 +1,67 @@
+schemaVersion: "2.2.0"
+metadata:
+  name: demo-lightwell
+  version: "1.0.0"
+  displayName: Lightwell Java Demo
+  description: JBoss legacy + Nexus Lightwell + RHDA (TPA/TDA) journey
+  tags: ["java", "maven", "jboss", "lightwell", "nexus"]
+
+components:
+  - name: tools
+    container:
+      image: quay.io/devfile/universal-developer-image:ubi9-latest
+      memoryLimit: 3Gi
+      memoryRequest: 1Gi
+      cpuLimit: "2"
+      cpuRequest: "200m"
+      mountSources: true
+      endpoints:
+        - name: http-app
+          targetPort: 8080
+          exposure: public
+      env:
+        - name: LIGHTWELL_TIER
+          value: validated
+
+commands:
+  - id: demo-up
+    exec:
+      label: "1) demo-up — Nexus + JBoss"
+      component: tools
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: "bash scripts/demo-up.sh"
+      group:
+        kind: build
+        isDefault: true
+
+  - id: analyze-cves
+    exec:
+      label: "2) analyze-cves — open pom for RHDA"
+      component: tools
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: |
+        echo "Open app/pom.xml and run: Red Hat Dependency Analytics Report"
+        echo "Extension: redhat.fabric8-analytics (Trusted Profile Analyzer / Dependency Analytics)"
+        echo "Tip: right-click pom.xml → Red Hat Dependency Analytics Report"
+        ls -la app/pom.xml
+        command -v mvn >/dev/null && mvn -f app/pom.xml dependency:tree -Dverbose=false || true
+
+  - id: open-jboss-console
+    exec:
+      label: "3) open-jboss-console"
+      component: tools
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: "bash scripts/open-jboss-console.sh"
+
+  - id: demo-status
+    exec:
+      label: "demo-status"
+      component: tools
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: |
+        oc get pods,route,pvc -l app.kubernetes.io/part-of=demo-lightwell 2>/dev/null || oc get pods,route,pvc
+        oc get pipelinerun 2>/dev/null | head -n 5 || true
+
+events:
+  postStart:
+    - demo-status

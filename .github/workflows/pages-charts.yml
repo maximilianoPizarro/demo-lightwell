@@ -32,6 +32,7 @@ jobs:
           cp LICENSE _site/ 2>/dev/null || true
           helm package charts/nexus -d _site/charts
           helm package charts/jboss-app -d _site/charts
+          helm package charts/devspaces-workspace -d _site/charts
           helm repo index _site/charts --url https://maximilianopizarro.github.io/demo-lightwell/charts
           cp artifacthub-repo.yml _site/charts/artifacthub-repo.yml
           # Landing note for charts path

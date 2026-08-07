@@ -23,6 +23,18 @@
 
 Lightwell Java demo for **OpenShift Dev Spaces** on Developer Sandbox: legacy WAR → **Nexus** (PVC) proxy → Lightwell **validated** demo registry, CVEs via **Red Hat Dependency Analytics** (TPA/TDA), **OpenShift Pipelines (Tekton)** + **Quay**, and a **GitHub Actions** contingency path that builds **without Nexus**.
 
+## 🚀 Quick Start: Open in Red Hat OpenShift Dev Spaces
+
+[![Open in Dev Spaces](https://img.shields.io/badge/Open_in-Dev_Spaces-EE0000?logo=redhat&style=for-the-badge)](https://devspaces.sandbox.developer.redhat.com/#https://github.com/maximilianoPizarro/demo-lightwell)
+
+Clicking the badge above leverages the **Dev Spaces Factory URL** to automatically provision a complete cloud development environment directly in your Red Hat Developer Sandbox.
+
+- **Zero-Install Setup:** It reads the repository's `.devfile.yaml` to spin up a Red Hat Universal Developer Image (UDI) container with OpenJDK 17.
+- **Security Tooling Pre-configured:** Automatically installs the **Red Hat Dependency Analytics (RHDA)** VS Code extension, allowing instant Trusted Profile Analyzer (TPA) / Trusted Dependency Analyzer (TDA) CVE scanning directly in your IDE.
+- **One-Click Execution:** Exposes custom IDE tasks (`demo-up`, `open-jboss-console`) to deploy Nexus, proxy Lightwell, and run the Tekton pipeline without touching a local terminal.
+
+---
+
 ## Documentation
 
 | Resource | Link |
@@ -89,7 +101,9 @@ bash scripts/setup-secrets.sh
 
 ## DevSpaces
 
-1. Create workspace from this Git repository.
+[![Open in Dev Spaces](https://img.shields.io/badge/Open_in-Dev_Spaces-EE0000?logo=redhat&style=for-the-badge)](https://devspaces.sandbox.developer.redhat.com/#https://github.com/maximilianoPizarro/demo-lightwell)
+
+1. Click the badge above to create a workspace from this Git repository (or alternatively, deploy the `devspaces-workspace` Helm chart).
 2. Run **demo-up**.
 3. Open `app/pom.xml` → Red Hat Dependency Analytics Report.
 4. Run **open-jboss-console**.

@@ -1,0 +1,7 @@
+workspace:
+  name: demo-lightwell
+  # Repository URL to clone and read the devfile from
+  gitRepo: https://github.com/maximilianoPizarro/demo-lightwell.git
+  branch: main
+  # Whether the workspace should automatically start upon creation
+  started: true

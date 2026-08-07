@@ -18,7 +18,7 @@ route:
 
 persistence:
   enabled: true
-  size: 2Gi
+  size: 8Gi
   storageClass: ""
   accessMode: ReadWriteOnce
 
@@ -51,3 +51,7 @@ lightwell:
 configureJob:
   enabled: true
   image: registry.access.redhat.com/ubi9/ubi:latest
+
+# Developer Sandbox / restricted-v2: omit hostUsers (breaks userns on some clusters)
+openshift:
+  hostUsersFalse: false

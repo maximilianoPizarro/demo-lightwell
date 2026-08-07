@@ -44,12 +44,27 @@ spec:
         app.kubernetes.io/name: {{ include "nexus.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      # OpenShift restricted-v2/v3: do NOT set fsGroup/runAsUser to Nexus UID 200.
+      # The platform injects an allowed UID/GID from the namespace range.
+      {{- if .Values.openshift.hostUsersFalse }}
+      hostUsers: false
+      {{- end }}
       securityContext:
-        fsGroup: 200
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: nexus
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           ports:
             - name: http
               containerPort: 8081
@@ -58,6 +73,8 @@ spec:
               value: {{ .Values.jvm.params | quote }}
             - name: NEXUS_SECURITY_RANDOMPASSWORD
               value: "false"
+            - name: NEXUS_DATA
+              value: /nexus-data
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
@@ -67,14 +84,14 @@ spec:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 60
+            initialDelaySeconds: 90
             periodSeconds: 15
-            failureThreshold: 20
+            failureThreshold: 24
           livenessProbe:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 120
+            initialDelaySeconds: 180
             periodSeconds: 30
             failureThreshold: 6
       volumes:

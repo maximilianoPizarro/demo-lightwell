@@ -1316,10 +1316,29 @@ Contrast — GitHub Actions contingency path (no Nexus):
       var statusEl = document.getElementById("journey-status");
       var prevBtn = document.getElementById("journey-prev");
       var nextBtn = document.getElementById("journey-next");
+      var fsBtn = document.getElementById("journey-fs");
       var index = 0;
       var timer = null;
       var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       var touchX = null;
+      var fsOpen = false;
+
+      function setFullscreen(on) {
+        fsOpen = !!on;
+        root.classList.toggle("is-fullscreen", fsOpen);
+        document.body.classList.toggle("journey-fs-open", fsOpen);
+        if (fsBtn) {
+          fsBtn.setAttribute("aria-pressed", fsOpen ? "true" : "false");
+          fsBtn.textContent = fsOpen ? "Exit fullscreen" : "Fullscreen";
+          fsBtn.setAttribute("aria-label", fsOpen ? "Exit fullscreen" : "Toggle fullscreen");
+        }
+        if (fsOpen) {
+          stop();
+          try { root.focus({ preventScroll: true }); } catch (_) { root.focus(); }
+        } else {
+          restart();
+        }
+      }
 
       var quayImg = document.getElementById("journey-quay-img");
       if (quayImg && quayImg.dataset.fallback) {
@@ -1355,7 +1374,7 @@ Contrast — GitHub Actions contingency path (no Nexus):
           else dot.removeAttribute("aria-current");
         });
         statusEl.textContent = (index + 1) + " / " + slides.length;
-        if (user) restart();
+        if (user && !fsOpen) restart();
       }
 
       function next() { go(index + 1, false); }
@@ -1372,15 +1391,28 @@ Contrast — GitHub Actions contingency path (no Nexus):
 
       prevBtn.addEventListener("click", function () { go(index - 1, true); });
       nextBtn.addEventListener("click", function () { go(index + 1, true); });
+      if (fsBtn) {
+        fsBtn.addEventListener("click", function () { setFullscreen(!fsOpen); });
+      }
       root.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && fsOpen) { e.preventDefault(); setFullscreen(false); return; }
         if (e.key === "ArrowRight") { e.preventDefault(); go(index + 1, true); }
         if (e.key === "ArrowLeft") { e.preventDefault(); go(index - 1, true); }
+        if ((e.key === "f" || e.key === "F") && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          e.preventDefault();
+          setFullscreen(!fsOpen);
+        }
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && fsOpen) setFullscreen(false);
       });
       root.addEventListener("mouseenter", stop);
-      root.addEventListener("mouseleave", restart);
+      root.addEventListener("mouseleave", function () {
+        if (!fsOpen) restart();
+      });
       root.addEventListener("focusin", stop);
       root.addEventListener("focusout", function (e) {
-        if (!root.contains(e.relatedTarget)) restart();
+        if (!fsOpen && !root.contains(e.relatedTarget)) restart();
       });
       root.addEventListener("touchstart", function (e) {
         touchX = e.changedTouches[0].clientX;

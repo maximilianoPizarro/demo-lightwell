@@ -177,28 +177,27 @@ jobs:
           QUAY_REPO: ${{ steps.meta.outputs.quay_repo }}
         run: |
           set -euo pipefail
-          AUTH=(-u "${QUAY_USERNAME}:${QUAY_PASSWORD}")
+          # Robot token for Quay API (Bearer). Basic auth triggers CSRF on quay.io.
+          HDR=(-H "Authorization: Bearer ${QUAY_PASSWORD}" -H "Content-Type: application/json")
           CODE=$(curl -sS -o /tmp/quay-repo.json -w "%{http_code}" \
-            "${AUTH[@]}" "https://quay.io/api/v1/repository/${QUAY_NS}/${QUAY_REPO}" || true)
+            "${HDR[@]}" "https://quay.io/api/v1/repository/${QUAY_NS}/${QUAY_REPO}" || true)
           echo "GET repository HTTP ${CODE}"
           if [ "${CODE}" = "200" ]; then
             echo "Quay repository ${QUAY_NS}/${QUAY_REPO} already exists"
           else
             echo "Creating Quay repository ${QUAY_NS}/${QUAY_REPO}..."
             HTTP=$(curl -sS -o /tmp/quay-create.json -w "%{http_code}" \
-              "${AUTH[@]}" -H "Content-Type: application/json" \
+              "${HDR[@]}" \
               -d "{\"repository\":\"${QUAY_REPO}\",\"visibility\":\"public\",\"description\":\"Lightwell Java demo\",\"namespace\":\"${QUAY_NS}\"}" \
               "https://quay.io/api/v1/repository" || true)
             echo "POST repository HTTP ${HTTP}"
             cat /tmp/quay-create.json || true
             if [ "${HTTP}" != "201" ] && [ "${HTTP}" != "200" ]; then
-              # Repo may already exist under a race, or robot lacks create — still try write grant + push.
-              echo "Create returned ${HTTP}; continuing (push will confirm Write)."
+              echo "Create returned ${HTTP}; continuing (docker push will confirm Write)."
             fi
           fi
-          # Ensure the robot used for docker login has write on the target repo.
           HTTP=$(curl -sS -o /tmp/quay-perm.json -w "%{http_code}" \
-            "${AUTH[@]}" -X PUT -H "Content-Type: application/json" \
+            "${HDR[@]}" -X PUT \
             -d '{"role":"write"}' \
             "https://quay.io/api/v1/repository/${QUAY_NS}/${QUAY_REPO}/permissions/user/${QUAY_USERNAME}" || true)
           echo "PUT robot write permission HTTP ${HTTP}"
@@ -206,6 +205,7 @@ jobs:
 
       - name: Build and push to Quay
         id: quay_push
+        continue-on-error: true
         uses: docker/build-push-action@v6
         with:
           context: .

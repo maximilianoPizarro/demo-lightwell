@@ -23,6 +23,8 @@ metadata:
   name: {{ include "jboss-app.fullname" . }}
   labels:
     {{- include "jboss-app.labels" . | nindent 4 }}
+  annotations:
+    {{- include "jboss-app.annotations" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -32,8 +34,7 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "jboss-app.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        {{- include "jboss-app.labels" . | nindent 8 }}
     spec:
       {{- if .Values.image.pullSecrets }}
       imagePullSecrets:
@@ -45,6 +46,7 @@ spec:
         - name: jboss
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/bash", "/opt/demo/wildfly-entrypoint.sh"]
           ports:
             - name: http
               containerPort: 8080
@@ -61,21 +63,46 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.admin.existingSecret }}
                   key: password
+            {{- $origins := include "jboss-app.managementAllowedOrigins" . | trim }}
+            {{- if $origins }}
+            - name: MANAGEMENT_ALLOWED_ORIGINS
+              value: {{ $origins | quote }}
+            {{- end }}
+          volumeMounts:
+            - name: wildfly-entrypoint
+              mountPath: /opt/demo/wildfly-entrypoint.sh
+              subPath: wildfly-entrypoint.sh
+              readOnly: true
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          # WildFly may return 403 on / for some welcome configs; TCP is reliable for sandbox demos.
           readinessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: http
             initialDelaySeconds: 40
             periodSeconds: 10
             failureThreshold: 12
           livenessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: http
             initialDelaySeconds: 90
             periodSeconds: 20
+            failureThreshold: 6
+      volumes:
+        - name: wildfly-entrypoint
+          configMap:
+            name: {{ include "jboss-app.fullname" . }}-entrypoint
+            defaultMode: 0755
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "jboss-app.fullname" . }}-entrypoint
+  labels:
+    {{- include "jboss-app.labels" . | nindent 4 }}
+data:
+  wildfly-entrypoint.sh: |
+{{ .Files.Get "files/wildfly-entrypoint.sh" | indent 4 }}
 ---
 {{- if .Values.route.enabled }}
 apiVersion: route.openshift.io/v1
@@ -87,6 +114,9 @@ metadata:
 spec:
   {{- if .Values.route.host }}
   host: {{ .Values.route.host | quote }}
+  {{- end }}
+  {{- if .Values.route.path }}
+  path: {{ .Values.route.path | quote }}
   {{- end }}
   to:
     kind: Service
@@ -108,6 +138,9 @@ metadata:
 spec:
   {{- if .Values.route.management.host }}
   host: {{ .Values.route.management.host | quote }}
+  {{- end }}
+  {{- if .Values.route.management.path }}
+  path: {{ .Values.route.management.path | quote }}
   {{- end }}
   to:
     kind: Service

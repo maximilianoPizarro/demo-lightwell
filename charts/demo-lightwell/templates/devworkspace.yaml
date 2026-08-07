@@ -1,0 +1,72 @@
+{{- if .Values.devspaces.enabled }}
+---
+apiVersion: workspace.devfile.io/v1alpha2
+kind: DevWorkspace
+metadata:
+  name: {{ .Values.devspaces.workspace.name }}
+  namespace: {{ include "demo-lightwell.devspacesNamespace" . }}
+  labels:
+    {{- include "demo-lightwell.labels" . | nindent 4 }}
+    app.kubernetes.io/component: devspaces
+spec:
+  started: {{ .Values.devspaces.workspace.started }}
+  routingClass: cluster-network
+  template:
+    attributes:
+      controller.devfile.io/storage-type: per-workspace
+    projects:
+      - name: demo-lightwell
+        git:
+          remotes:
+            origin: {{ .Values.devspaces.workspace.gitRepo | quote }}
+          checkoutFrom:
+            revision: {{ .Values.devspaces.workspace.branch | quote }}
+    components:
+      - name: tools
+        container:
+          image: quay.io/devfile/universal-developer-image:ubi9-latest
+          memoryLimit: 3Gi
+          memoryRequest: 1Gi
+          cpuLimit: "2"
+          cpuRequest: "200m"
+          mountSources: true
+          endpoints:
+            - name: http-app
+              targetPort: 8080
+              exposure: public
+          env:
+            - name: LIGHTWELL_TIER
+              value: {{ .Values.lightwell.tier | quote }}
+            - name: DEMO_NAMESPACE
+              value: {{ .Release.Namespace | quote }}
+    commands:
+      - id: demo-status
+        exec:
+          label: "demo-status"
+          component: tools
+          workingDir: ${PROJECT_SOURCE}
+          commandLine: |
+            echo "App namespace: ${DEMO_NAMESPACE:-$(oc project -q)}"
+            oc project "${DEMO_NAMESPACE}" >/dev/null 2>&1 || true
+            oc get pods,route,pvc,pipelinerun 2>/dev/null | head -n 40 || true
+            echo
+            echo "Open app/pom.xml → Red Hat Dependency Analytics Report (CVEs / TPA)"
+      - id: analyze-cves
+        exec:
+          label: "analyze-cves — prepare RHDA (then open report in IDE)"
+          component: tools
+          workingDir: ${PROJECT_SOURCE}
+          commandLine: |
+            bash scripts/rhda-prepare.sh
+      - id: open-jboss-console
+        exec:
+          label: "open-jboss-console"
+          component: tools
+          workingDir: ${PROJECT_SOURCE}
+          commandLine: |
+            oc project "${DEMO_NAMESPACE}" >/dev/null 2>&1 || true
+            bash scripts/open-jboss-console.sh
+    events:
+      postStart:
+        - demo-status
+{{- end }}

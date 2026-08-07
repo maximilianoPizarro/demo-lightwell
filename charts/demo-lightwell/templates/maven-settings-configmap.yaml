@@ -1,0 +1,70 @@
+{{- if .Values.tekton.enabled }}
+---
+# Maven settings for Tekton (workspace maven-settings → settings.xml).
+# Lightwell service account authenticates on the Nexus *remote* proxy (configure Job),
+# not in every Maven client. Clients talk only to in-cluster Nexus.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.tekton.mavenSettingsConfigMap | default "maven-settings-lightwell" }}
+  labels:
+    {{- include "demo-lightwell.labels" . | nindent 4 }}
+data:
+  settings.xml: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
+      <!--
+        All resolution goes through Nexus maven-public (includes Lightwell proxy + central).
+        Nexus uses Secret lightwell-sa when fetching from packages.redhat.com.
+      -->
+      <mirrors>
+        <mirror>
+          <id>maven-default-http-blocker</id>
+          <mirrorOf>dummy</mirrorOf>
+          <name>Override default HTTP blocker for in-cluster Nexus</name>
+          <url>http://0.0.0.0/</url>
+          <blocked>false</blocked>
+        </mirror>
+        <mirror>
+          <id>nexus-maven-public</id>
+          <name>Nexus group (Lightwell SA on remote + Maven Central)</name>
+          <url>http://nexus:8081/repository/maven-public/</url>
+          <mirrorOf>*</mirrorOf>
+        </mirror>
+      </mirrors>
+      <profiles>
+        <profile>
+          <id>nexus-lightwell</id>
+          <repositories>
+            <repository>
+              <id>nexus-maven-public</id>
+              <name>Nexus maven-public</name>
+              <url>http://nexus:8081/repository/maven-public/</url>
+              <releases>
+                <enabled>true</enabled>
+                <!-- Lightwell upstream often has no .sha1/.md5 beside the jar -->
+                <checksumPolicy>warn</checksumPolicy>
+              </releases>
+              <snapshots><enabled>false</enabled></snapshots>
+            </repository>
+          </repositories>
+          <pluginRepositories>
+            <pluginRepository>
+              <id>nexus-maven-public</id>
+              <url>http://nexus:8081/repository/maven-public/</url>
+              <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+              </releases>
+              <snapshots><enabled>false</enabled></snapshots>
+            </pluginRepository>
+          </pluginRepositories>
+        </profile>
+      </profiles>
+      <activeProfiles>
+        <activeProfile>nexus-lightwell</activeProfile>
+      </activeProfiles>
+    </settings>
+{{- end }}

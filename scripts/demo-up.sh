@@ -1,38 +1,43 @@
 #!/usr/bin/env bash
-# Journey step 1: bring up Nexus + JBoss (contingency image) + optional Tekton
+# Journey step 1: install the umbrella chart
+# - secrets + Nexus + Lightwell proxy
+# - Tekton PipelineRun → OpenShift internal registry (Quay optional)
+# - DevWorkspace in Dev Spaces namespace
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 NS="${NS:-$(oc project -q)}"
+RELEASE="${RELEASE:-demo}"
 
-echo "== demo-up in namespace ${NS} =="
+echo "== demo-up in namespace ${NS} (release=${RELEASE}) =="
 
-if ! oc get secret lightwell-sa -n "${NS}" >/dev/null 2>&1; then
-  echo "Missing secret lightwell-sa. Run scripts/setup-secrets.sh first." >&2
-  exit 1
-fi
-
-echo "-- Helm: Nexus --"
-helm upgrade --install nexus "${ROOT}/charts/nexus" -n "${NS}" --wait --timeout 10m || {
-  echo "Helm wait timed out; continuing to check pods..."
-  oc get pods -n "${NS}" -l app.kubernetes.io/name=nexus || true
-}
-
-echo "-- Helm: JBoss app (tag=contingency by default) --"
-IMAGE_TAG="${IMAGE_TAG:-contingency}"
-if oc get pipelinerun -n "${NS}" >/dev/null 2>&1; then
-  echo "Tekton available — starting pipeline (best effort)..."
-  oc apply -f "${ROOT}/pipelines/" -n "${NS}" || true
-  if command -v tkn >/dev/null; then
-    tkn pipeline start lightwell-build-deploy -n "${NS}" --showlog=false \
-      --workspace name=source,emptyDir="" \
-      --param IMAGE_TAG=latest || true
-    IMAGE_TAG="latest"
+if grep -qE 'lightwell:\s*$|username: "CHANGE_ME"|token: "CHANGE_ME"' "${ROOT}/charts/demo-lightwell/values.yaml" \
+  && grep -q 'CHANGE_ME' "${ROOT}/charts/demo-lightwell/values.yaml"; then
+  # Only fail if lightwell credentials still placeholder
+  if grep -A2 '^lightwell:' "${ROOT}/charts/demo-lightwell/values.yaml" | grep -q 'CHANGE_ME'; then
+    echo "ERROR: edit charts/demo-lightwell/values.yaml lightwell.username / lightwell.token" >&2
+    exit 1
   fi
 fi
 
-helm upgrade --install jboss-app "${ROOT}/charts/jboss-app" -n "${NS}" \
-  --set image.tag="${IMAGE_TAG}" \
-  --wait --timeout 8m || true
+INTERNAL_IMAGE="image-registry.openshift-image-registry.svc:5000/${NS}/demo-lightwell"
+
+helm dependency update "${ROOT}/charts/demo-lightwell"
+helm upgrade --install "${RELEASE}" "${ROOT}/charts/demo-lightwell" -n "${NS}" \
+  --set "jboss-app.image.repository=${INTERNAL_IMAGE}" \
+  --set jboss-app.image.tag=latest \
+  --set 'jboss-app.image.pullSecrets={}' \
+  --wait --timeout 12m \
+  || echo "WARN: helm --wait timed out (Nexus/JBoss may still be starting; PipelineRun continues)."
+
+echo
+echo "Internal image target: ${INTERNAL_IMAGE}:latest"
+echo "PipelineRuns:"
+oc get pipelinerun -n "${NS}" 2>/dev/null || true
+DS_NS="${NS%-dev}-devspaces"
+if [[ "${NS}" == *-dev ]]; then
+  echo "DevWorkspace namespace: ${DS_NS}"
+  oc get devworkspace -n "${DS_NS}" 2>/dev/null || true
+fi
 
 NEXUS_HOST=$(oc get route nexus -n "${NS}" -o jsonpath='{.spec.host}' 2>/dev/null || true)
 APP_HOST=$(oc get route jboss-app -n "${NS}" -o jsonpath='{.spec.host}' 2>/dev/null || true)
@@ -42,4 +47,4 @@ echo
 echo "App:      https://${APP_HOST}"
 echo "Console:  https://${MGMT_HOST}"
 echo "Nexus:    https://${NEXUS_HOST}"
-echo "Next:     open app/pom.xml → RHDA report → task open-jboss-console"
+echo "Next:     open Dev Spaces workspace → app/pom.xml → RHDA (CVEs)"

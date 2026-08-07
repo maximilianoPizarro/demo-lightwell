@@ -2,10 +2,10 @@ apiVersion: v2
 name: demo-lightwell
 description: Umbrella chart for the Lightwell Java demo — secrets, Nexus (Lightwell proxy), JBoss/WildFly, Tekton PipelineRun to OpenShift internal registry (optional Quay), and DevWorkspace.
 type: application
-version: 0.2.0
+version: 0.2.2
 appVersion: "1.0.0"
 home: https://maximilianopizarro.github.io/demo-lightwell/
-icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/demo-lightwell-icon.png
+icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/lightwell_logo_light.svg
 keywords:
   - lightwell
   - nexus
@@ -22,10 +22,10 @@ maintainers:
     email: maximiliano.pizarro.5@gmail.com
 dependencies:
   - name: nexus
-    version: "0.1.0"
+    version: "0.1.1"
     repository: "file://../nexus"
   - name: jboss-app
-    version: "0.1.0"
+    version: "0.1.3"
     repository: "file://../jboss-app"
 annotations:
   artifacthub.io/license: Apache-2.0
@@ -34,10 +34,12 @@ annotations:
   artifacthub.io/links: |
     - name: Documentation
       url: https://maximilianopizarro.github.io/demo-lightwell/
-    - name: Journey (validated demo)
-      url: https://github.com/maximilianoPizarro/demo-lightwell/blob/main/docs/JOURNEY.md
-    - name: Journey (remediated)
-      url: https://github.com/maximilianoPizarro/demo-lightwell/blob/main/docs/JOURNEY-REMEDIATED.md
+    - name: Run the demo
+      url: https://maximilianopizarro.github.io/demo-lightwell/#run
+    - name: App & console access
+      url: https://maximilianopizarro.github.io/demo-lightwell/#access
+    - name: Day-2 remediated tier
+      url: https://maximilianopizarro.github.io/demo-lightwell/#day2
     - name: Lightwell product
       url: https://www.redhat.com/en/lightwell
     - name: Source
@@ -51,6 +53,8 @@ annotations:
     - title: Architecture
       url: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/lightwell-architecture.png
   artifacthub.io/changes: |
+    - kind: fixed
+      description: HAL console CORS — jboss-app sets management allowed-origins for OpenShift edge Routes
     - kind: fixed
       description: Artifact Hub images use public Nexus/WildFly bases (app image is internal/GHCR)
     - kind: changed

@@ -20,9 +20,20 @@ service:
 route:
   enabled: true
   host: ""
+  # App home (HealthServlet on / and /health)
+  path: /
+  # OpenShift apps domain (e.g. apps.rm2.thpm.p1.openshiftapps.com). Used to build
+  # MANAGEMENT_ALLOWED_ORIGINS when management.host is empty. If blank, Helm tries
+  # lookup of config.openshift.io/v1 Ingress/cluster.
+  clusterDomain: ""
   management:
     enabled: true
     host: ""
+    # Leave empty: HAL needs /console AND /management on the same host
+    path: ""
+    # Optional override list of HTTPS origins for WildFly http-interface allowed-origins.
+    # When empty, derived as https://{management host}.
+    allowedOrigins: []
 
 resources:
   requests:

@@ -34,6 +34,8 @@ jobs:
           helm package charts/nexus -d docs/charts
           helm package charts/jboss-app -d docs/charts
           helm package charts/devspaces-workspace -d docs/charts
+          helm dependency update charts/demo-lightwell
+          helm package charts/demo-lightwell -d docs/charts
           helm repo index docs/charts --url https://maximilianopizarro.github.io/demo-lightwell/charts
           cp docs/artifacthub-repo.yml docs/charts/artifacthub-repo.yml
           ls -la docs/charts

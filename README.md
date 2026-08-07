@@ -25,7 +25,7 @@ Lightwell Java demo for **OpenShift Dev Spaces** on Developer Sandbox: legacy WA
 
 ## 🚀 Quick Start: Open in Red Hat OpenShift Dev Spaces
 
-[![Open in Dev Spaces](https://img.shields.io/badge/Open_in-Dev_Spaces-EE0000?logo=redhat&style=for-the-badge)](https://devspaces.sandbox.developer.redhat.com/#https://github.com/maximilianoPizarro/demo-lightwell)
+[![Open in Dev Spaces](https://img.shields.io/badge/Open_in-Dev_Spaces-EE0000?logo=redhat&style=for-the-badge)](https://workspaces.openshift.com/#https://github.com/maximilianoPizarro/demo-lightwell)
 
 Clicking the badge above leverages the **Dev Spaces Factory URL** to automatically provision a complete cloud development environment directly in your Red Hat Developer Sandbox.
 
@@ -63,50 +63,65 @@ Charts include Artifact Hub annotations in `charts/*/Chart.yaml` (links, categor
 ```bash
 helm repo add demo-lightwell https://maximilianopizarro.github.io/demo-lightwell/charts
 helm repo update
-helm install nexus demo-lightwell/nexus
-helm install jboss-app demo-lightwell/jboss-app
+# Recommended: one umbrella install (secrets + Nexus + JBoss + Tekton)
+helm install demo demo-lightwell/demo-lightwell
+# Or install subcharts individually:
+# helm install nexus demo-lightwell/nexus
+# helm install jboss-app demo-lightwell/jboss-app
 ```
 
 ## Layout
 
 ```
-app/                  Maven WAR (commons-io / commons-fileupload Lightwell versions)
-charts/nexus/         Thin Nexus OSS + PVC + Lightwell configure Job
-charts/jboss-app/     WildFly/JBoss deploy + app & management Routes
-pipelines/            Tekton Pipeline (maven → buildah → helm)
-.github/workflows/    Contingency image + GitHub Pages / Helm index
-.devfile.yaml         demo-up / analyze-cves / open-jboss-console
-docs/                 Pages site, journeys, brand logos
-scripts/              setup-secrets, demo-up, cleanup, tier helpers
-artifacthub-repo.yml  Artifact Hub repository metadata
+app/                         Maven WAR (Lightwell commons-io / commons-fileupload)
+charts/demo-lightwell/       Umbrella chart (secrets + Nexus + JBoss + Tekton)
+charts/nexus/                Thin Nexus OSS + PVC + Lightwell configure Job
+charts/jboss-app/            WildFly/JBoss deploy + app & management Routes
+charts/devspaces-workspace/  Optional DevWorkspace CR via Helm/GitOps
+pipelines/                   Tekton Pipeline reference (also in umbrella templates)
+.github/workflows/           Release image (GHCR) + GitHub Pages / Helm index
+.devfile.yaml                demo-up / analyze-cves / open-jboss-console
+docs/                        Pages site, journeys, brand logos
+scripts/                     demo-up, cleanup, tier helpers
+artifacthub-repo.yml         Artifact Hub repository metadata
 ```
 
-## Secrets (never commit)
+## Fork: edit values, then one Helm install
 
-| Name | Purpose |
-|------|---------|
-| `LIGHTWELL_USERNAME` | `id\|account` service account |
-| `LIGHTWELL_TOKEN` | SA token |
-| `LIGHTWELL_TIER` | `validated` (default) or `remediated` |
-| `QUAY_USERNAME` / `QUAY_PASSWORD` | Quay robot |
-| `QUAY_IMAGE` | `quay.io/maximilianopizarro/demo-lightwell` |
+After forking, edit **only** [`charts/demo-lightwell/values.yaml`](charts/demo-lightwell/values.yaml):
+
+| Key | Purpose |
+|-----|---------|
+| `lightwell.username` | `id\|account` service account |
+| `lightwell.token` | SA JWT |
+| `quay.username` / `quay.password` | Quay robot |
+| `quay.image` + `jboss-app.image.repository` | Your Quay image path |
 
 ```bash
-export LIGHTWELL_USERNAME='...'
-export LIGHTWELL_TOKEN='...'
-export QUAY_USERNAME='...'
-export QUAY_PASSWORD='...'
-bash scripts/setup-secrets.sh
+helm dependency update charts/demo-lightwell
+NS=$(oc project -q)
+helm upgrade --install demo charts/demo-lightwell --wait --timeout 12m \
+  --set jboss-app.image.repository=image-registry.openshift-image-registry.svc:5000/$NS/demo-lightwell \
+  --set 'jboss-app.image.pullSecrets={}'
 ```
+
+On install the chart also:
+
+- Starts a Tekton **PipelineRun** that builds/pushes to the **OpenShift internal registry** (default)
+- Creates a **DevWorkspace** in `*-devspaces`
+- Optionally pushes to Quay with `--set quay.push=true` (+ credentials)
+
+Optional: `scripts/setup-secrets.sh` remains for standalone / GitHub Secrets setup without the umbrella chart.
 
 ## DevSpaces
 
-[![Open in Dev Spaces](https://img.shields.io/badge/Open_in-Dev_Spaces-EE0000?logo=redhat&style=for-the-badge)](https://devspaces.sandbox.developer.redhat.com/#https://github.com/maximilianoPizarro/demo-lightwell)
+[![Open in Dev Spaces](https://img.shields.io/badge/Open_in-Dev_Spaces-EE0000?logo=redhat&style=for-the-badge)](https://workspaces.openshift.com/#https://github.com/maximilianoPizarro/demo-lightwell)
 
 1. Click the badge above to create a workspace from this Git repository (or alternatively, deploy the `devspaces-workspace` Helm chart).
-2. Run **demo-up**.
-3. Open `app/pom.xml` → Red Hat Dependency Analytics Report.
-4. Run **open-jboss-console**.
+2. Ensure `charts/demo-lightwell/values.yaml` has your credentials (no `CHANGE_ME`).
+3. Run **demo-up** (umbrella Helm install).
+4. Open `app/pom.xml` → Red Hat Dependency Analytics Report.
+5. Run **open-jboss-console**.
 
 ## Quay contingency image
 

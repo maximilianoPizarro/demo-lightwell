@@ -1,0 +1,316 @@
+{{- if .Values.tekton.enabled }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: lightwell-pipeline
+  labels:
+    {{- include "demo-lightwell.labels" . | nindent 4 }}
+---
+# Bind to cluster "edit" — Developer Sandbox forbids custom Role grants beyond held verbs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: lightwell-pipeline
+  labels:
+    {{- include "demo-lightwell.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+  - kind: ServiceAccount
+    name: lightwell-pipeline
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: git-clone-lightwell
+  labels:
+    {{- include "demo-lightwell.labels" . | nindent 4 }}
+spec:
+  params:
+    - name: url
+      type: string
+    - name: revision
+      type: string
+      default: main
+  workspaces:
+    - name: output
+  steps:
+    - name: clone
+      # Public image with git preinstalled (RH pipelines-git-init requires a pinned tag + pull secret)
+      image: docker.io/alpine/git:2.47.2
+      workingDir: $(workspaces.output.path)
+      script: |
+        #!/bin/sh
+        set -eu
+        # Workspace may contain lost+found / initializer files — clone then sync.
+        rm -rf /tmp/src
+        git clone --depth 1 --branch "$(params.revision)" "$(params.url)" /tmp/src
+        # Copy into workspace (keep going if some files are immutable)
+        cp -a /tmp/src/. "$(workspaces.output.path)/"
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: maven-lightwell
+  labels:
+    {{- include "demo-lightwell.labels" . | nindent 4 }}
+spec:
+  params:
+    - name: GOALS
+      type: string
+      default: "package -DskipTests"
+    - name: NEXUS_REPO_URL
+      type: string
+      default: "http://nexus:8081/repository/maven-lightwell-validated/"
+  workspaces:
+    - name: source
+    - name: maven-settings
+  steps:
+    - name: mvn-settings
+      image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+      env:
+        - name: LIGHTWELL_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: lightwell-sa
+              key: username
+      script: |
+        #!/bin/bash
+        set -euo pipefail
+        SETTINGS="$(workspaces.maven-settings.path)/settings.xml"
+        if [ ! -f "${SETTINGS}" ]; then
+          echo "ERROR: missing ${SETTINGS} (mount ConfigMap maven-settings-lightwell)"
+          ls -la "$(workspaces.maven-settings.path)" || true
+          exit 1
+        fi
+        echo "using existing ${SETTINGS}"
+        echo "Lightwell service account (Nexus remote auth): ${LIGHTWELL_USERNAME}"
+        echo "Maven clients use Nexus only; SA credentials stay on the Nexus proxy remote."
+        grep -E 'mirrorOf|repository/maven' "${SETTINGS}" || true
+    - name: maven
+      image: registry.access.redhat.com/ubi9/openjdk-17:1.21
+      workingDir: $(workspaces.source.path)/app
+      env:
+        - name: LIGHTWELL_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: lightwell-sa
+              key: username
+      script: |
+        #!/bin/bash
+        set -euo pipefail
+        SETTINGS="$(workspaces.maven-settings.path)/settings.xml"
+        # Wait for Nexus Lightwell proxy (chart may still be starting)
+        for i in $(seq 1 60); do
+          if curl -sf -o /dev/null "$(params.NEXUS_REPO_URL)" || curl -sf -o /dev/null "http://nexus:8081/"; then
+            echo "Nexus reachable (Lightwell SA on proxy remote: ${LIGHTWELL_USERNAME})"
+            break
+          fi
+          sleep 10
+        done
+        echo "STEP-MVN using ${SETTINGS}"
+        mvn -B -s "${SETTINGS}" $(params.GOALS)
+        test -f target/demo-lightwell.war
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: oc-build-internal
+  labels:
+    {{- include "demo-lightwell.labels" . | nindent 4 }}
+spec:
+  params:
+    - name: IMAGE_STREAM
+      type: string
+      default: demo-lightwell
+    - name: TAG
+      type: string
+      default: latest
+    - name: PUSH_TO_QUAY
+      type: string
+      default: "false"
+    - name: QUAY_IMAGE
+      type: string
+      default: ""
+  workspaces:
+    - name: source
+  steps:
+    - name: build-internal
+      image: quay.io/openshift/origin-cli:4.16
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/bin/bash
+        set -euo pipefail
+        IS="$(params.IMAGE_STREAM)"
+        TAG="$(params.TAG)"
+        echo "Building to ImageStream ${IS}:${TAG} (OpenShift internal registry)"
+        # Ensure BuildConfig output tag matches PIPELINE IMAGE_TAG
+        oc patch bc "${IS}" --type=merge -p "{\"spec\":{\"output\":{\"to\":{\"kind\":\"ImageStreamTag\",\"name\":\"${IS}:${TAG}\"}}}}" 2>/dev/null || true
+        # Binary build uses Containerfile.runtime (WAR already in app/target)
+        oc start-build "${IS}" --from-dir=. --follow --wait
+        # Older BCs may still emit :contingency — normalize to requested tag
+        oc tag "${IS}:contingency" "${IS}:${TAG}" 2>/dev/null || true
+        oc get istag "${IS}:${TAG}"
+        echo "Internal image ready: image-registry.openshift-image-registry.svc:5000/$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)/${IS}:${TAG}"
+    # Always defined; gated by PUSH_TO_QUAY param (and requires secret quay-creds).
+    - name: push-quay
+      image: quay.io/skopeo/stable:latest
+      workingDir: $(workspaces.source.path)
+      env:
+        - name: QUAY_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: quay-creds
+              key: username
+              optional: true
+        - name: QUAY_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: quay-creds
+              key: password
+              optional: true
+      script: |
+        #!/bin/bash
+        set -euo pipefail
+        if [ "$(params.PUSH_TO_QUAY)" != "true" ]; then
+          echo "quay.push disabled — skip"
+          exit 0
+        fi
+        if [ -z "${QUAY_USERNAME:-}" ] || [ -z "${QUAY_PASSWORD:-}" ]; then
+          echo "ERROR: PUSH_TO_QUAY=true but secret quay-creds is missing username/password"
+          exit 1
+        fi
+        if [ -z "$(params.QUAY_IMAGE)" ]; then
+          echo "ERROR: QUAY_IMAGE param is empty"
+          exit 1
+        fi
+        NS="$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)"
+        SRC="docker://image-registry.openshift-image-registry.svc:5000/${NS}/$(params.IMAGE_STREAM):$(params.TAG)"
+        DST="docker://$(params.QUAY_IMAGE):$(params.TAG)"
+        echo "Copying ${SRC} → ${DST}"
+        TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+        skopeo copy --src-creds="unused:${TOKEN}" --src-tls-verify=false \
+          --dest-creds="${QUAY_USERNAME}:${QUAY_PASSWORD}" \
+          "${SRC}" "${DST}"
+        skopeo copy --src-creds="unused:${TOKEN}" --src-tls-verify=false \
+          --dest-creds="${QUAY_USERNAME}:${QUAY_PASSWORD}" \
+          "${SRC}" "docker://$(params.QUAY_IMAGE):contingency" || true
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: oc-deploy-jboss
+  labels:
+    {{- include "demo-lightwell.labels" . | nindent 4 }}
+spec:
+  params:
+    - name: IMAGE
+      type: string
+    - name: TAG
+      type: string
+      default: latest
+    - name: DEPLOYMENT
+      type: string
+      default: jboss-app
+  steps:
+    - name: set-image
+      image: quay.io/openshift/origin-cli:4.16
+      script: |
+        #!/bin/bash
+        set -euo pipefail
+        IMG="$(params.IMAGE):$(params.TAG)"
+        echo "Updating deployment/$(params.DEPLOYMENT) → ${IMG}"
+        oc set image "deployment/$(params.DEPLOYMENT)" "jboss=${IMG}" --record=false
+        # Drop Quay pull secrets when using internal registry
+        oc patch "deployment/$(params.DEPLOYMENT)" --type=json \
+          -p='[{"op":"remove","path":"/spec/template/spec/imagePullSecrets"}]' 2>/dev/null || true
+        oc rollout status "deployment/$(params.DEPLOYMENT)" --timeout=300s
+---
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: lightwell-build-deploy
+  labels:
+    {{- include "demo-lightwell.labels" . | nindent 4 }}
+spec:
+  params:
+    - name: GIT_URL
+      type: string
+      default: {{ .Values.tekton.gitRepo | quote }}
+    - name: GIT_REVISION
+      type: string
+      default: {{ .Values.tekton.gitRevision | quote }}
+    - name: IMAGE_STREAM
+      type: string
+      default: {{ .Values.tekton.imageStream | quote }}
+    - name: IMAGE_TAG
+      type: string
+      default: {{ .Values.tekton.imageTag | quote }}
+    - name: INTERNAL_IMAGE
+      type: string
+      default: {{ include "demo-lightwell.internalImage" . | quote }}
+    - name: PUSH_TO_QUAY
+      type: string
+      default: {{ .Values.quay.push | quote }}
+    - name: QUAY_IMAGE
+      type: string
+      default: {{ .Values.quay.image | quote }}
+    - name: NEXUS_REPO_URL
+      type: string
+      default: "http://nexus:8081/repository/{{ .Values.nexus.lightwell.repositoryName }}/"
+  workspaces:
+    - name: source
+    - name: maven-settings
+  tasks:
+    - name: clone
+      taskRef:
+        name: git-clone-lightwell
+      params:
+        - name: url
+          value: $(params.GIT_URL)
+        - name: revision
+          value: $(params.GIT_REVISION)
+      workspaces:
+        - name: output
+          workspace: source
+    - name: maven
+      runAfter: [clone]
+      taskRef:
+        name: maven-lightwell
+      params:
+        - name: NEXUS_REPO_URL
+          value: $(params.NEXUS_REPO_URL)
+      workspaces:
+        - name: source
+          workspace: source
+        - name: maven-settings
+          workspace: maven-settings
+    - name: build-push
+      runAfter: [maven]
+      taskRef:
+        name: oc-build-internal
+      params:
+        - name: IMAGE_STREAM
+          value: $(params.IMAGE_STREAM)
+        - name: TAG
+          value: $(params.IMAGE_TAG)
+        - name: PUSH_TO_QUAY
+          value: $(params.PUSH_TO_QUAY)
+        - name: QUAY_IMAGE
+          value: $(params.QUAY_IMAGE)
+      workspaces:
+        - name: source
+          workspace: source
+    - name: deploy
+      runAfter: [build-push]
+      taskRef:
+        name: oc-deploy-jboss
+      params:
+        - name: IMAGE
+          value: $(params.INTERNAL_IMAGE)
+        - name: TAG
+          value: $(params.IMAGE_TAG)
+{{- end }}

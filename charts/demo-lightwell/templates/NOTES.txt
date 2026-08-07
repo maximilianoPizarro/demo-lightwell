@@ -1,0 +1,50 @@
+============================================================
+  demo-lightwell deployed
+============================================================
+
+Release:   {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+Installed:
+  - Secrets (lightwell-sa{{- if .Values.quay.push }}, quay-creds{{- end }})
+  - Nexus (+ Lightwell proxy configure Job)
+  - JBoss/WildFly app (image updated by PipelineRun)
+{{- if .Values.tekton.enabled }}
+  - ImageStream/BuildConfig {{ .Values.tekton.imageStream }}
+  - Tekton Pipeline lightwell-build-deploy
+  {{- if .Values.tekton.autoStart }}
+  - PipelineRun auto-started → OpenShift internal registry
+    image: {{ include "demo-lightwell.internalImage" . }}:{{ .Values.tekton.imageTag }}
+  {{- end }}
+  {{- if .Values.quay.push }}
+  - Also pushing to Quay: {{ .Values.quay.image }}
+  {{- end }}
+{{- end }}
+{{- if .Values.devspaces.enabled }}
+  - DevWorkspace "{{ .Values.devspaces.workspace.name }}"
+    namespace: {{ include "demo-lightwell.devspacesNamespace" . }}
+{{- end }}
+
+Check status:
+  oc get pods,route,pipelinerun -n {{ .Release.Namespace }}
+  oc get pipelinerun -n {{ .Release.Namespace }} -w
+{{- if .Values.devspaces.enabled }}
+  oc get devworkspace -n {{ include "demo-lightwell.devspacesNamespace" . }}
+{{- end }}
+
+Routes (paths preconfigured):
+  oc get route -n {{ .Release.Namespace }}
+  # jboss-app      → /health
+  # jboss-app-mgmt → /console
+  # nexus          → /
+
+Quay push (optional):
+  helm upgrade {{ .Release.Name }} charts/demo-lightwell \
+    --reuse-values \
+    --set quay.push=true \
+    --set quay.username='...' \
+    --set quay.password='...' \
+    --set quay.image=quay.io/YOU/demo-lightwell
+
+Docs: https://maximilianopizarro.github.io/demo-lightwell/
+============================================================

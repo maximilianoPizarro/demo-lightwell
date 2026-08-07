@@ -14,4 +14,3 @@ Logos and marks included under `docs/brand/` are **trademarks of Red Hat, Inc. o
 | `nexus.png` | [Steve Hipwell's Helm charts](https://raw.githubusercontent.com/stevehipwell/helm-charts/main/charts/nexus3/icon.png) (Sonatype Nexus Repository logo) |
 
 Design tokens and typography follow [ux.redhat.com](https://ux.redhat.com/) (`--rh-color-brand-red` `#ee0000`) and [Red Hat Display / Text](https://fonts.google.com/specimen/Red+Hat+Display).
-| `demo-lightwell-icon.png` | Generated package icon for Artifact Hub (inspired by Lightwell shield / container security language; not an official Red Hat logo) |

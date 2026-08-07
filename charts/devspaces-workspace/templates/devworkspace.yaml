@@ -49,15 +49,11 @@ spec:
             isDefault: true
       - id: analyze-cves
         exec:
-          label: "2) analyze-cves — open pom for RHDA"
+          label: "2) analyze-cves — prepare RHDA (then open report in IDE)"
           component: tools
           workingDir: ${PROJECT_SOURCE}
           commandLine: |
-            echo "Open app/pom.xml and run: Red Hat Dependency Analytics Report"
-            echo "Extension: redhat.fabric8-analytics (Trusted Profile Analyzer / Dependency Analytics)"
-            echo "Tip: right-click pom.xml → Red Hat Dependency Analytics Report"
-            ls -la app/pom.xml
-            command -v mvn >/dev/null && mvn -f app/pom.xml dependency:tree -Dverbose=false || true
+            bash scripts/rhda-prepare.sh
       - id: open-jboss-console
         exec:
           label: "3) open-jboss-console"

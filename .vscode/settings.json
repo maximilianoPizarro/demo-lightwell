@@ -1,0 +1,18 @@
+{
+  "redhat.telemetry.enabled": true,
+  "java.server.launchMode": "Standard",
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.import.maven.enabled": true,
+  "maven.userSettings": "${workspaceFolder}/.m2/settings.xml",
+  "java.configuration.maven.userSettings": "${workspaceFolder}/.m2/settings.xml",
+  "maven.executable.preferMavenWrapper": false,
+  "redHatDependencyAnalytics.reportFilePath": "${workspaceFolder}/.rhda/redhatDependencyAnalyticsReport.html",
+  "redHatDependencyAnalytics.backendUrl": "https://rhda.rhcloud.com",
+  "redHatDependencyAnalytics.mvn.preferWrapper": "false",
+  "redHatDependencyAnalytics.mvn.additionalArgs": [
+    "-s",
+    "${workspaceFolder}/.m2/settings.xml"
+  ],
+  "redHatDependencyAnalytics.vulnerabilityAlertSeverity": "Error",
+  "redHatDependencyAnalytics.recommendations.enabled": true
+}

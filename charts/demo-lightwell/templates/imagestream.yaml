@@ -1,0 +1,38 @@
+{{- if .Values.tekton.enabled }}
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: {{ .Values.tekton.imageStream }}
+  labels:
+    {{- include "demo-lightwell.labels" . | nindent 4 }}
+spec:
+  lookupPolicy:
+    local: true
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: {{ .Values.tekton.imageStream }}
+  labels:
+    {{- include "demo-lightwell.labels" . | nindent 4 }}
+spec:
+  source:
+    type: Binary
+    binary: {}
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Containerfile.runtime
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {{ printf "%s:%s" .Values.tekton.imageStream .Values.tekton.imageTag | quote }}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+{{- end }}

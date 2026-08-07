@@ -30,6 +30,8 @@ metadata:
   name: {{ include "nexus.fullname" . }}
   labels:
     {{- include "nexus.labels" . | nindent 4 }}
+  annotations:
+    {{- include "nexus.annotations" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   strategy:
@@ -41,8 +43,7 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "nexus.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        {{- include "nexus.labels" . | nindent 8 }}
     spec:
       # OpenShift restricted-v2/v3: do NOT set fsGroup/runAsUser to Nexus UID 200.
       # The platform injects an allowed UID/GID from the namespace range.

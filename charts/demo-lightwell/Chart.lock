@@ -1,0 +1,9 @@
+dependencies:
+- name: nexus
+  repository: file://../nexus
+  version: 0.1.1
+- name: jboss-app
+  repository: file://../jboss-app
+  version: 0.1.3
+digest: sha256:7e53028b2258d60ad010d05c807ae37decb681fb7fb10a64cf6fd45800f1b436
+generated: "2026-08-07T17:25:03.9150919-03:00"

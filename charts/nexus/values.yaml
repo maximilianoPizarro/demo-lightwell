@@ -15,6 +15,8 @@ service:
 route:
   enabled: true
   host: ""
+  # Nexus UI root (deep-links use client hash, e.g. /#browse/browse:maven-lightwell-validated)
+  path: /
 
 persistence:
   enabled: true
@@ -46,7 +48,8 @@ lightwell:
   repositoryName: maven-lightwell-validated
   # Credentials come from existing Secret lightwell-sa (keys: username, token)
   existingSecret: lightwell-sa
-  layoutPolicy: STRICT
+  # PERMISSIVE: Lightwell serves artifacts via S3 redirects; STRICT breaks some proxies
+  layoutPolicy: PERMISSIVE
 
 configureJob:
   enabled: true

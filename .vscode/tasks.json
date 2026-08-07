@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "rhda-prepare (Maven + Nexus settings)",
+      "type": "shell",
+      "command": "bash scripts/rhda-prepare.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "RHDA: open pom.xml then run report from Command Palette",
+      "type": "shell",
+      "command": "bash -lc 'code -r -g app/pom.xml:1 2>/dev/null || true; echo; echo \"Now: Ctrl+Shift+P → Red Hat Dependency Analytics Report\"; echo \"Report file: .rhda/redhatDependencyAnalyticsReport.html\"'",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "dependsOn": ["rhda-prepare (Maven + Nexus settings)"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

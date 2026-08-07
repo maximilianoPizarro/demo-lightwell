@@ -2,10 +2,10 @@ apiVersion: v2
 name: jboss-app
 description: JBoss/WildFly deployment for the Lightwell Java demo WAR (app + management console Routes) on OpenShift.
 type: application
-version: 0.1.1
+version: 0.1.3
 appVersion: "1.0.0"
 home: https://maximilianopizarro.github.io/demo-lightwell/
-icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/demo-lightwell-icon.png
+icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/lightwell_logo_light.svg
 keywords:
   - lightwell
   - jboss
@@ -24,21 +24,32 @@ annotations:
   artifacthub.io/links: |
     - name: Documentation
       url: https://maximilianopizarro.github.io/demo-lightwell/
-    - name: Journey
-      url: https://github.com/maximilianoPizarro/demo-lightwell/blob/main/docs/JOURNEY.md
+    - name: App & console access
+      url: https://maximilianopizarro.github.io/demo-lightwell/#access
+    - name: RHDA report
+      url: https://maximilianopizarro.github.io/demo-lightwell/#rhda
     - name: Lightwell product
       url: https://www.redhat.com/en/lightwell
     - name: Source
       url: https://github.com/maximilianoPizarro/demo-lightwell
-  # Public base image only — app tags are built to OpenShift internal registry / GHCR
-  # (Quay :contingency is optional and may not exist; listing it breaks Artifact Hub scan).
+  # Public base image only — Artifact Hub Security Report scans THESE images (stock
+  # commons-io CVEs in WildFly layers). App Maven deps use Lightwell .rhlw GAVs via Nexus
+  # and are a different plane (see Pages #proof). Do not list private Quay tags.
   artifacthub.io/images: |
     - name: wildfly-runtime
       image: quay.io/wildfly/wildfly:27.0.1.Final-jdk17
   artifacthub.io/screenshots: |
     - title: Architecture
       url: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/lightwell-architecture.png
+    - title: App home (Lightwell commons-io)
+      url: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/journey/14-demo-app-home.png
+    - title: RHDA report
+      url: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/journey/13-rhda-dependency-analytics-report.png
   artifacthub.io/changes: |
+    - kind: fixed
+      description: Set WildFly management allowed-origins so HAL console works behind OpenShift edge TLS (browser Origin no longer 403)
+    - kind: added
+      description: Chart README for Artifact Hub; Pages links for access and RHDA
     - kind: fixed
       description: Point Artifact Hub image scan to public WildFly base (remove missing Quay contingency tag)
     - kind: added

@@ -9,7 +9,11 @@ target/
 settings-lightwell-direct.xml
 **/settings.xml
 !app/settings-lightwell-direct.xml.template
+!settings/maven-devspaces.xml.template
 !k8s/**/*.yaml
+.rhda/
+!.rhda/.gitkeep
+.m2/
 kubeconfig
 .oc/
 *.war

@@ -1,0 +1,48 @@
+{{- if and .Values.tekton.enabled .Values.tekton.autoStart }}
+---
+# Auto-start build to OpenShift internal registry on install/upgrade.
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: lightwell-build-deploy-{{ .Release.Revision }}
+  labels:
+    {{- include "demo-lightwell.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "20"
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  pipelineRef:
+    name: lightwell-build-deploy
+  taskRunTemplate:
+    serviceAccountName: lightwell-pipeline
+  params:
+    - name: GIT_URL
+      value: {{ .Values.tekton.gitRepo | quote }}
+    - name: GIT_REVISION
+      value: {{ .Values.tekton.gitRevision | quote }}
+    - name: IMAGE_STREAM
+      value: {{ .Values.tekton.imageStream | quote }}
+    - name: IMAGE_TAG
+      value: {{ .Values.tekton.imageTag | quote }}
+    - name: INTERNAL_IMAGE
+      value: {{ include "demo-lightwell.internalImage" . | quote }}
+    - name: PUSH_TO_QUAY
+      value: {{ .Values.quay.push | quote }}
+    - name: QUAY_IMAGE
+      value: {{ .Values.quay.image | quote }}
+    - name: NEXUS_REPO_URL
+      value: "http://nexus:8081/repository/{{ .Values.nexus.lightwell.repositoryName }}/"
+  workspaces:
+    - name: source
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: {{ .Values.tekton.workspaceSize | quote }}
+    - name: maven-settings
+      configMap:
+        name: {{ .Values.tekton.mavenSettingsConfigMap | default "maven-settings-lightwell" }}
+{{- end }}

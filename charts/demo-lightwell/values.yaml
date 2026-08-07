@@ -1,0 +1,87 @@
+# =============================================================================
+# demo-lightwell umbrella chart — EDIT AFTER FORK
+# =============================================================================
+# 1. Fork https://github.com/maximilianoPizarro/demo-lightwell
+# 2. Set lightwell.username / lightwell.token (required)
+# 3. Optional: quay.push=true + quay credentials to also publish to Quay
+# 4. helm dependency update charts/demo-lightwell
+# 5. helm upgrade --install demo charts/demo-lightwell
+#    → creates Nexus + secrets + ImageStream + Tekton PipelineRun (internal registry)
+#    → creates DevWorkspace in the Dev Spaces namespace
+# =============================================================================
+
+# --- CREDENTIALS -------------------------------------------------------------
+lightwell:
+  username: "CHANGE_ME"           # id|account-name from packages.redhat.com
+  token: "CHANGE_ME"              # SA JWT
+  tier: validated                 # validated | remediated | validated-prod
+
+# Quay is optional. Default build/push target is the OpenShift internal registry.
+quay:
+  # Set true to also push the image to Quay after the internal build
+  push: false
+  username: ""
+  password: ""
+  image: "quay.io/CHANGE_ME/demo-lightwell"
+
+jbossAdmin:
+  username: admin
+  password: "Admin#123"
+
+# --- CONFIG ------------------------------------------------------------------
+secrets:
+  create: true
+
+tekton:
+  enabled: true
+  # Create a PipelineRun automatically on install/upgrade
+  autoStart: true
+  gitRepo: https://github.com/maximilianoPizarro/demo-lightwell.git
+  gitRevision: main
+  imageStream: demo-lightwell
+  imageTag: latest
+  # PVC size for pipeline workspace (git + maven)
+  workspaceSize: 2Gi
+  # ConfigMap key settings.xml mounted as Tekton workspace maven-settings
+  mavenSettingsConfigMap: maven-settings-lightwell
+
+# OpenShift Dev Spaces workspace (created with the chart)
+# On Developer Sandbox you typically CANNOT create DevWorkspaces in *-devspaces
+# from *-dev (Forbidden). Default = release namespace. Prefer the Factory URL badge
+# for Sandbox (Eclipse Che hosted by Red Hat): https://workspaces.openshift.com/#https://github.com/...
+devspaces:
+  enabled: true
+  # Empty = release namespace (recommended for Sandbox). Set explicitly if needed.
+  namespace: ""
+  workspace:
+    name: demo-lightwell
+    gitRepo: https://github.com/maximilianoPizarro/demo-lightwell.git
+    branch: main
+    started: true
+
+# --- Subchart: nexus ---------------------------------------------------------
+nexus:
+  persistence:
+    size: 8Gi
+  lightwell:
+    existingSecret: lightwell-sa
+    remoteUrl: "https://packages.redhat.com/api/pulp-content/public-lightwell-demo/java/validated/"
+    repositoryName: maven-lightwell-validated
+    layoutPolicy: STRICT
+
+# --- Subchart: jboss-app -----------------------------------------------------
+# Image is rewritten by the PipelineRun after the internal build succeeds.
+# Set repository at install time to:
+#   image-registry.openshift-image-registry.svc:5000/<namespace>/demo-lightwell
+jboss-app:
+  image:
+    repository: image-registry.openshift-image-registry.svc:5000/REPLACE_NS/demo-lightwell
+    tag: latest
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+  # Required for HAL behind edge TLS when Ingress lookup is forbidden (Developer Sandbox).
+  # Example: apps.rm2.thpm.p1.openshiftapps.com — or set route.management.allowedOrigins.
+  route:
+    clusterDomain: ""
+  admin:
+    existingSecret: jboss-admin

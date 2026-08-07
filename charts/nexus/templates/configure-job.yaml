@@ -17,40 +17,40 @@ data:
     ADMIN_USER="admin"
     ADMIN_PASS="${NEXUS_ADMIN_PASSWORD}"
 
-    echo "Waiting for Nexus at ${NEXUS_URL} ..."
-    for i in $(seq 1 60); do
-      if curl -sf -o /dev/null "${NEXUS_URL}/service/rest/v1/status"; then
-        echo "Nexus is up"
-        break
-      fi
-      # fallback: root path
-      if curl -sf -o /dev/null "${NEXUS_URL}/"; then
-        echo "Nexus HTTP is up"
+    echo "Waiting for Nexus API at ${NEXUS_URL} ..."
+    READY=0
+    for i in $(seq 1 90); do
+      if curl -sf -u "${ADMIN_USER}:${ADMIN_PASS}" \
+          -o /dev/null "${NEXUS_URL}/service/rest/v1/repositories"; then
+        echo "Nexus admin API is ready (attempt ${i})"
+        READY=1
         break
       fi
       sleep 10
     done
-
-    # Change default password if still admin123 from first boot file
-    if [ -f /nexus-data/admin.password ]; then
-      echo "Initial admin.password file present on volume (managed by Deployment mount skip)"
+    if [ "${READY}" != "1" ]; then
+      echo "ERROR: Nexus admin API not ready after waiting" >&2
+      exit 1
     fi
 
     AUTH=(-u "${ADMIN_USER}:${ADMIN_PASS}")
 
-    # Try to accept EULA / change password on fresh install
+    # Idempotent: change password / accept first-boot if needed
     curl -sf "${AUTH[@]}" -H "Content-Type: text/plain" \
       -X PUT "${NEXUS_URL}/service/rest/v1/security/users/admin/change-password" \
       -d "${ADMIN_PASS}" || true
 
-    EXISTS=$(curl -sf "${AUTH[@]}" "${NEXUS_URL}/service/rest/v1/repositories" | grep -c "\"${REPO_NAME}\"" || true)
+    EXISTS=$(curl -sf "${AUTH[@]}" "${NEXUS_URL}/service/rest/v1/repositories" \
+      | grep -c "\"name\"[[:space:]]*:[[:space:]]*\"${REPO_NAME}\"" || true)
     if [ "${EXISTS}" != "0" ]; then
-      echo "Repository ${REPO_NAME} already exists"
-      exit 0
+      echo "Repository ${REPO_NAME} already exists — updating remote URL/auth via delete+recreate"
+      curl -sf "${AUTH[@]}" -X DELETE \
+        "${NEXUS_URL}/service/rest/v1/repositories/${REPO_NAME}" || true
     fi
 
     echo "Creating Maven proxy ${REPO_NAME} -> ${REMOTE_URL}"
-    curl -sf "${AUTH[@]}" -H "Content-Type: application/json" \
+    HTTP_CODE=$(curl -s -o /tmp/nexus-create.out -w "%{http_code}" "${AUTH[@]}" \
+      -H "Content-Type: application/json" \
       -X POST "${NEXUS_URL}/service/rest/v1/repositories/maven/proxy" \
       -d @- <<EOF
     {
@@ -58,7 +58,7 @@ data:
       "online": true,
       "storage": {
         "blobStoreName": "default",
-        "strictContentTypeValidation": true
+        "strictContentTypeValidation": false
       },
       "proxy": {
         "remoteUrl": "${REMOTE_URL}",
@@ -66,44 +66,92 @@ data:
         "metadataMaxAge": 1440
       },
       "negativeCache": {
-        "enabled": true,
-        "timeToLive": 1440
+        "enabled": false,
+        "timeToLive": 1
       },
       "httpClient": {
         "blocked": false,
         "autoBlock": true,
+        "connection": {
+          "enableCircularRedirects": true,
+          "enableCookies": true
+        },
         "authentication": {
           "type": "username",
           "username": "${LW_USER}",
-          "password": "${LW_PASS}"
+          "password": "${LW_PASS}",
+          "preemptive": false
         }
       },
       "maven": {
         "versionPolicy": "RELEASE",
-        "layoutPolicy": "{{ .Values.lightwell.layoutPolicy }}"
+        "layoutPolicy": "PERMISSIVE"
       }
     }
     EOF
-    echo "Lightwell proxy configured"
+    )
+    echo "Create response HTTP ${HTTP_CODE}"
+    cat /tmp/nexus-create.out || true
+    if [ "${HTTP_CODE}" != "201" ] && [ "${HTTP_CODE}" != "204" ]; then
+      # 400 if already exists is acceptable after race
+      if curl -sf "${AUTH[@]}" "${NEXUS_URL}/service/rest/v1/repositories" | grep -q "\"${REPO_NAME}\""; then
+        echo "Repository ${REPO_NAME} is present"
+      else
+        echo "ERROR: failed to create repository" >&2
+        exit 1
+      fi
+    fi
+    echo "Lightwell proxy configured: ${REPO_NAME} (remote auth = Lightwell service account ${LW_USER})"
+
+    # Ensure maven-public group includes Lightwell so Maven can mirrorOf * via one URL.
+    echo "Updating maven-public group to include ${REPO_NAME}"
+    curl -sf "${AUTH[@]}" \
+      -H "Content-Type: application/json" \
+      -X PUT "${NEXUS_URL}/service/rest/v1/repositories/maven/group/maven-public" \
+      -d @- <<EOF || true
+    {
+      "name": "maven-public",
+      "online": true,
+      "storage": {
+        "blobStoreName": "default",
+        "strictContentTypeValidation": true
+      },
+      "group": {
+        "memberNames": [
+          "maven-releases",
+          "maven-snapshots",
+          "${REPO_NAME}",
+          "maven-central"
+        ]
+      }
+    }
+    EOF
+    echo "maven-public members:"
+    curl -sf "${AUTH[@]}" "${NEXUS_URL}/service/rest/v1/repositories/maven/group/maven-public" \
+      | grep -o '"memberNames"[^]]*]' || true
 ---
+# Regular Job (not a Helm hook) so it runs even when --wait blocks on other pods.
+# Name includes Release.Revision so upgrades create a fresh Job.
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ include "nexus.fullname" . }}-configure-{{ .Release.Revision }}
   labels:
     {{- include "nexus.labels" . | nindent 4 }}
-  annotations:
-    helm.sh/hook: post-install,post-upgrade
-    helm.sh/hook-weight: "5"
-    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
 spec:
-  backoffLimit: 6
+  backoffLimit: 8
+  ttlSecondsAfterFinished: 86400
   template:
+    metadata:
+      labels:
+        {{- include "nexus.labels" . | nindent 8 }}
+        app.kubernetes.io/component: configure
     spec:
       restartPolicy: OnFailure
       containers:
         - name: configure
           image: {{ .Values.configureJob.image | quote }}
+          imagePullPolicy: IfNotPresent
           command: ["/bin/bash", "/scripts/configure-lightwell.sh"]
           env:
             - name: LIGHTWELL_REPO_NAME
@@ -125,6 +173,20 @@ spec:
                 secretKeyRef:
                   name: {{ include "nexus.fullname" . }}-admin
                   key: password
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           volumeMounts:
             - name: scripts
               mountPath: /scripts

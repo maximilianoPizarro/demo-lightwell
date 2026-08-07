@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>demo-lightwell — Lightwell Java on OpenShift Dev Spaces</title>
-  <meta name="description" content="Demo journey: Lightwell Maven registry, Nexus, OpenShift Dev Spaces, Pipelines, Quay, and RHDA/TPA." />
-  <link rel="icon" href="brand/demo-lightwell-icon.png" />
+  <meta name="description" content="Secure Java demo: Red Hat Lightwell Network, CVE visibility (RHDA/TPA), Nexus, OpenShift Dev Spaces and Pipelines." />
+  <link rel="icon" href="brand/lightwell_logo_light.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700&family=Red+Hat+Text:wght@400;500&display=swap" rel="stylesheet" />
@@ -126,7 +126,6 @@
       box-shadow: 0 8px 24px rgba(21,21,21,.06);
     }
     .logo-card img.lw { width: min(100%, 320px); height: auto; }
-    .logo-card img.icon { width: 96px; height: 96px; border-radius: 12px; }
     section { margin: 2.75rem 0; }
     h2 {
       font-family: var(--rh-font-display);
@@ -158,6 +157,46 @@
     }
     .tile p { margin: 0; color: var(--rh-color-text-secondary); font-size: 0.95rem; flex: 1; }
     .tile a { font-weight: 600; font-size: 0.9rem; }
+    .journey-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 800px) { .journey-grid { grid-template-columns: 1fr; } }
+    .journey-card {
+      background: #fff;
+      border: 1px solid var(--rh-color-border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .journey-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-bottom: 1px solid var(--rh-color-border);
+    }
+    .journey-card figcaption {
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      color: var(--rh-color-text-secondary);
+    }
+    .journey-card strong {
+      display: block;
+      color: var(--rh-color-text-primary);
+      font-family: var(--rh-font-display);
+      margin-bottom: 0.25rem;
+    }
+    .callout {
+      background: #fff;
+      border-left: 4px solid var(--rh-color-brand-red);
+      border: 1px solid var(--rh-color-border);
+      border-left-width: 4px;
+      border-left-color: var(--rh-color-brand-red);
+      border-radius: 0 8px 8px 0;
+      padding: 1rem 1.25rem;
+      max-width: 48rem;
+    }
+    .callout p { margin: 0.35rem 0; color: var(--rh-color-text-secondary); }
     .arch {
       width: 100%;
       border-radius: 8px;
@@ -223,6 +262,75 @@
       padding: 0.1em 0.35em;
       border-radius: 3px;
     }
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+    @media (max-width: 800px) { .compare { grid-template-columns: 1fr; } }
+    .compare-pane {
+      background: #fff;
+      border: 1px solid var(--rh-color-border);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+    .compare-pane h3 {
+      font-family: var(--rh-font-display);
+      font-size: 1.05rem;
+      margin: 0 0 0.5rem;
+    }
+    .compare-pane.risk { border-top: 3px solid #c9190b; }
+    .compare-pane.safe { border-top: 3px solid #3e8635; }
+    .compare-pane ul { margin: 0.5rem 0 0; padding-left: 1.1rem; color: var(--rh-color-text-secondary); }
+    .compare-pane li { margin: 0.35rem 0; }
+    table.gav {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border: 1px solid var(--rh-color-border);
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 0.92rem;
+      margin: 1rem 0 1.5rem;
+    }
+    table.gav th, table.gav td {
+      text-align: left;
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid var(--rh-color-border);
+      vertical-align: top;
+    }
+    table.gav th {
+      font-family: var(--rh-font-display);
+      background: var(--rh-color-surface-subtle);
+      font-weight: 700;
+    }
+    table.gav tr:last-child td { border-bottom: none; }
+    .tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.45rem;
+      border-radius: 3px;
+    }
+    .tag-risk { background: #faeae8; color: #a30000; }
+    .tag-ok { background: #e9f5e8; color: #1e4f18; }
+    .proof-shot {
+      width: 100%;
+      border: 1px solid var(--rh-color-border);
+      border-radius: 8px;
+      display: block;
+      background: #151515;
+    }
+    .proof-caption {
+      font-size: 0.9rem;
+      color: var(--rh-color-text-secondary);
+      margin: 0.6rem 0 0;
+      max-width: 48rem;
+    }
+    .muted.wide { max-width: 48rem; }
   </style>
 </head>
 <body>
@@ -232,11 +340,13 @@
         <img class="rh-mark" src="brand/redhat-logo-on-light.svg" alt="Red Hat" />
       </a>
       <nav>
-        <a href="https://github.com/maximilianoPizarro/demo-lightwell/blob/main/docs/JOURNEY.md">Journey</a>
-        <a href="https://github.com/maximilianoPizarro/demo-lightwell/blob/main/docs/JOURNEY-REMEDIATED.md">Remediated</a>
-        <a href="https://github.com/maximilianoPizarro/demo-lightwell">GitHub</a>
+        <a href="#run">Run</a>
+        <a href="#access">Access</a>
+        <a href="#rhda">RHDA report</a>
+        <a href="#proof">CVE proof</a>
+        <a href="#charts">Charts</a>
         <a href="https://artifacthub.io/packages/search?repo=demo-lightwell">Artifact Hub</a>
-        <a href="https://www.redhat.com/en/lightwell">Lightwell</a>
+        <a href="https://github.com/maximilianoPizarro/demo-lightwell">GitHub</a>
       </nav>
     </div>
   </header>
@@ -247,16 +357,19 @@
         <div class="eyebrow">Red Hat Lightwell Network · Java demo</div>
         <h1>Secure legacy Java deps on OpenShift Dev Spaces</h1>
         <p class="lead">
-          End-to-end demo: Maven resolves through Nexus into the Lightwell validated registry,
-          RHDA/TPA surfaces CVEs in the IDE, Tekton builds with Red Hat images, and Quay holds the contingency image.
+          Two planes: Artifact Hub flags stock <code>commons-io</code> inside the WildFly
+          <a href="https://artifacthub.io/packages/helm/demo-lightwell/jboss-app?modal=security-report">image scan</a>;
+          the app builds with Lightwell <code>.rhlw</code> coordinates via Nexus.
+          RHDA still lists OSV findings on those GAVs — and shows Red Hat <em>remediations available</em>
+          (not an all-green “zero CVE” badge on the demo validated tier).
         </p>
         <div class="cta">
-          <a class="btn-devspaces" href="https://devspaces.sandbox.developer.redhat.com/#https://github.com/maximilianoPizarro/demo-lightwell" title="Open in Red Hat OpenShift Dev Spaces">
+          <a class="btn-devspaces" href="https://workspaces.openshift.com/#https://github.com/maximilianoPizarro/demo-lightwell" title="Open in Red Hat OpenShift Dev Spaces">
             <img alt="Open in Dev Spaces" src="https://img.shields.io/badge/Open_in-Dev_Spaces-EE0000?logo=redhat&amp;style=for-the-badge" height="36" />
           </a>
-          <a class="btn btn-primary" href="https://github.com/maximilianoPizarro/demo-lightwell">View on GitHub</a>
-          <a class="btn btn-secondary" href="https://github.com/maximilianoPizarro/demo-lightwell/blob/main/docs/JOURNEY.md">3-step DevSpaces journey</a>
-          <a class="btn btn-secondary" href="charts/">Helm charts</a>
+          <a class="btn btn-primary" href="#run">3-step journey</a>
+          <a class="btn btn-secondary" href="#access">App &amp; console access</a>
+          <a class="btn btn-secondary" href="#charts">Helm charts</a>
         </div>
         <div class="badges">
           <img alt="License" src="https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square" />
@@ -264,11 +377,11 @@
           <img alt="Pipelines" src="https://img.shields.io/badge/OpenShift-Pipelines-EE0000?style=flat-square" />
           <img alt="Quay" src="https://img.shields.io/badge/Quay-contingency-40B4E5?style=flat-square" />
           <img alt="Lightwell" src="https://img.shields.io/badge/Lightwell-validated%20demo-EE0000?style=flat-square" />
+          <img alt="CVE proof" src="https://img.shields.io/badge/CVE--2024--47554-stock%20vs%20.rhlw-c9190b?style=flat-square" />
         </div>
       </div>
       <div class="logo-card">
-        <img class="lw" src="brand/lightwell_logo_light.svg" alt="Official Lightwell logo" />
-        <img class="icon" src="brand/demo-lightwell-icon.png" alt="demo-lightwell package icon" />
+        <img class="lw" src="brand/lightwell_logo_light.svg" alt="Official Red Hat Lightwell logo" />
         <p class="muted" style="margin:0;text-align:center;font-size:0.85rem;">
           Official Lightwell mark from
           <a href="https://www.redhat.com/en/lightwell">redhat.com/en/lightwell</a>
@@ -303,32 +416,347 @@
 
     <section>
       <h2>Architecture</h2>
-      <p class="muted">DevSpaces / Tekton → Nexus → Lightwell registry; GHA contingency → Quay → JBoss console.</p>
+      <p class="muted wide">DevSpaces / Tekton → Nexus → Lightwell registry; GHA contingency → image registry → JBoss console.</p>
       <img class="arch" src="lightwell-architecture.png" alt="Lightwell demo architecture diagram" />
     </section>
 
-    <section>
-      <h2>Developer journey</h2>
-      <ol class="steps">
-        <li>Create a Dev Spaces workspace from this Git repository (<code>.devfile.yaml</code>).</li>
-        <li>Run <strong>demo-up</strong> — Nexus + Lightwell proxy + JBoss (contingency or Tekton).</li>
-        <li>Open <code>app/pom.xml</code> → Red Hat Dependency Analytics Report (CVEs / TPA).</li>
-        <li>Run <strong>open-jboss-console</strong> for the management Route.</li>
-      </ol>
-      <p style="margin-top:1rem;">
-        Day-2 with a subscription:
-        <a href="https://github.com/maximilianoPizarro/demo-lightwell/blob/main/docs/JOURNEY-REMEDIATED.md">switch validated → remediated</a>.
+    <section id="run">
+      <h2>Run the demo (3 steps)</h2>
+      <p class="muted wide">
+        Factory URL (OpenShift Dev Spaces / Developer Sandbox):
+        <a href="https://workspaces.openshift.com/#https://github.com/maximilianoPizarro/demo-lightwell">workspaces.openshift.com/#…/demo-lightwell</a>
       </p>
+      <ol class="steps">
+        <li>
+          <strong>demo-up</strong> — Helm umbrella: Nexus + Lightwell proxy (SA on the remote) + Tekton PipelineRun + JBoss deploy.
+          Or from a laptop: <code>helm upgrade --install demo charts/demo-lightwell …</code> with Lightwell SA in values.
+        </li>
+        <li>
+          <strong>analyze-cves</strong> — prepares Maven settings → Nexus and the workspace report path under <code>.rhda/</code>.
+          Then open <code>app/pom.xml</code> and run <strong>Red Hat Dependency Analytics Report</strong>
+          (Command Palette, pie-chart icon, or right-click). The terminal alone never opens the HTML report.
+        </li>
+        <li>
+          Open the <a href="#access">app home and HAL console</a> using the Routes below.
+        </li>
+      </ol>
+    </section>
+
+    <section id="access">
+      <h2>Access — app &amp; JBoss / WildFly console</h2>
+      <p class="muted wide">
+        Live Developer Sandbox project <code>maximilianopizarro5-dev</code> (adjust namespace/host for your cluster).
+        Management credentials come from Secret <code>jboss-admin</code> (baked into the image via <code>add-user.sh</code>).
+      </p>
+      <table class="gav">
+        <thead>
+          <tr>
+            <th>Surface</th>
+            <th>URL</th>
+            <th>Credentials</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>App home</td>
+            <td><a href="https://jboss-app-maximilianopizarro5-dev.apps.rm2.thpm.p1.openshiftapps.com/">jboss-app-…/ </a></td>
+            <td>none</td>
+          </tr>
+          <tr>
+            <td>Health JSON</td>
+            <td><a href="https://jboss-app-maximilianopizarro5-dev.apps.rm2.thpm.p1.openshiftapps.com/health">…/health</a></td>
+            <td>none — expect <code>commons-io: 2.11.0.rhlw-00001</code></td>
+          </tr>
+          <tr>
+            <td>HAL Management Console</td>
+            <td><a href="https://jboss-app-mgmt-maximilianopizarro5-dev.apps.rm2.thpm.p1.openshiftapps.com/console">jboss-app-mgmt-…/console</a></td>
+            <td><code>admin</code> / <code>Admin#123</code></td>
+          </tr>
+          <tr>
+            <td>Nexus UI</td>
+            <td><a href="https://nexus-maximilianopizarro5-dev.apps.rm2.thpm.p1.openshiftapps.com/">nexus-…/</a></td>
+            <td>demo admin (chart default <code>admin123</code>)</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout" style="max-width:48rem;">
+        <p><strong>HAL console notes</strong></p>
+        <p>
+          Use the <em>management</em> Route host (not the app Route). Leave the Route path empty so both
+          <code>/console</code> and <code>/management</code> work on the same host — a <code>/console</code>-only path breaks Bootstrap (503).
+          Login: username <code>admin</code>, password <code>Admin#123</code> (override via Secret <code>jboss-admin</code> keys <code>username</code> / <code>password</code>).
+        </p>
+        <p>
+          If the browser console shows <code>/management</code> <strong>403</strong> and “Authentication required” while Keycloak adapter is 404,
+          WildFly rejected the HAL <code>Origin</code> header. The chart sets <code>MANAGEMENT_ALLOWED_ORIGINS</code> to the management Route HTTPS URL
+          (http-interface <code>allowed-origins</code>). Keycloak 404 is expected — this demo uses local ManagementRealm digest auth, not Keycloak.
+        </p>
+      </div>
+      <figure style="margin-top:1.25rem;">
+        <img class="proof-shot" src="journey/14-demo-app-home.png" alt="Lightwell Java Demo app home showing commons-io rhlw version" style="background:#fff;" />
+        <figcaption class="proof-caption">
+          App home: Status OK and Lightwell-resolved <code>commons-io:2.11.0.rhlw-00001</code>.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section id="rhda">
+      <h2>Red Hat Dependency Analytics Report</h2>
+      <p class="muted wide">
+        Extension <code>redhat.fabric8-analytics</code> (Trusted Profile Analyzer / Dependency Analytics).
+        After <strong>analyze-cves</strong>, open <code>app/pom.xml</code> → Command Palette →
+        <strong>Red Hat Dependency Analytics Report</strong>.
+      </p>
+      <figure>
+        <img
+          class="proof-shot"
+          src="journey/13-rhda-dependency-analytics-report.png"
+          alt="Full Red Hat Dependency Analytics Report in Dev Spaces"
+        />
+        <figcaption class="proof-caption">
+          Live Dev Spaces report: dependencies already on Lightwell coordinates
+          (<code>2.11.0.rhlw-00001</code> / <code>1.4.0.rhlw-00001</code>).
+          Green banner = <strong>remediations available</strong>; table still lists Direct Vulnerabilities from OSV
+          (validated demo is not an all-green “zero CVE” badge).
+        </figcaption>
+      </figure>
+    </section>
+
+    <section id="proof">
+      <h2>Proof: image scan vs Maven Lightwell vs RHDA</h2>
+      <p class="muted wide">
+        Three different signals — do not expect RHDA to go “all green” just because the pom uses
+        <code>.rhlw</code> from the <strong>validated demo</strong> tier.
+      </p>
+
+      <div class="compare">
+        <div class="compare-pane risk">
+          <h3><span class="tag tag-risk">1) Artifact Hub (image)</span></h3>
+          <ul>
+            <li>Scans chart image <code>quay.io/wildfly/wildfly:27.0.1…</code></li>
+            <li>Stock <code>commons-io:2.11.0</code> in layers → <strong>CVE-2024-47554</strong></li>
+            <li>Does <em>not</em> list the app’s <code>2.11.0.rhlw-00001</code> GAV</li>
+            <li><a href="https://artifacthub.io/packages/helm/demo-lightwell/jboss-app?modal=security-report">Open Security Report</a></li>
+          </ul>
+        </div>
+        <div class="compare-pane safe">
+          <h3><span class="tag tag-ok">2) App build (Lightwell)</span></h3>
+          <ul>
+            <li><code>app/pom.xml</code> → Nexus → Lightwell <strong>validated</strong> demo</li>
+            <li>Coordinates: <code>…rhlw-00001</code> (not Maven Central stock)</li>
+            <li>Runtime health: <code>commons-io: 2.11.0.rhlw-00001</code></li>
+            <li>“Validated” = trusted Lightwell path for the demo — not “OSV says 0 CVEs”</li>
+          </ul>
+        </div>
+      </div>
+
+      <table class="gav">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>What it looks at</th>
+            <th>What you should see</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Artifact Hub</td>
+            <td>Chart <code>artifacthub.io/images</code> (WildFly)</td>
+            <td>CVEs on <strong>stock</strong> jars in the image (e.g. commons-io 2.11.0)</td>
+          </tr>
+          <tr>
+            <td>Nexus / health endpoint</td>
+            <td>Resolved Maven artifacts</td>
+            <td><code>2.11.0.rhlw-00001</code> from Lightwell proxy</td>
+          </tr>
+          <tr>
+            <td>RHDA / TPA (IDE)</td>
+            <td><code>pom.xml</code> + OSV / Red Hat remediation data</td>
+            <td>Still may show Direct Vulnerabilities on <code>.rhlw</code> rows <em>and</em>
+                “Red Hat Dependency Remediations available” (the green check)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <figure>
+        <img
+          class="proof-shot"
+          src="journey/12-artifacthub-commons-io-cve-stock.png"
+          alt="Artifact Hub Security Report showing CVE-2024-47554 for stock commons-io 2.11.0"
+        />
+        <figcaption class="proof-caption">
+          Artifact Hub: High CVE on stock <code>commons-io</code> 2.11.0 inside the WildFly image
+          (not the Lightwell Maven GAV).
+        </figcaption>
+      </figure>
+
+      <div class="callout" style="margin-top:1.5rem;max-width:48rem;">
+        <p><strong>Why it is not all green</strong></p>
+        <p>
+          RHDA queries vulnerability databases (here <code>rhtpa/osv-github</code>).
+          Those databases often still associate CVEs with the upstream lineage even when you consume a
+          Lightwell <code>.rhlw</code> rebuild from the <em>public validated demo</em> catalog.
+          What Lightwell + RHDA add in this demo is: you are on Red Hat coordinates, and the report
+          surfaces <em>remediation availability</em> (see <a href="#rhda">RHDA report</a>).
+          Clearing every OSV finding is the product path
+          (subscription <strong>remediated</strong> tier + newer <code>.rhlw-*</code> builds), not a promise of the sandbox demo alone.
+          For deeper remediations with a subscription, see <a href="#day2">Day-2: remediated tier</a>.
+        </p>
+      </div>
     </section>
 
     <section>
-      <h2>Documentation</h2>
+      <h2>Secure development journey</h2>
+      <p class="muted">
+        Lightwell remediates vulnerable Java deps; RHDA/TPA surfaces CVEs in the IDE;
+        Tekton builds through Nexus→Lightwell on OpenShift.
+      </p>
+      <div class="journey-grid">
+        <figure class="journey-card">
+          <img src="journey/01-developer-sandbox.png" alt="Red Hat Developer Sandbox" />
+          <figcaption><strong>1. Developer Sandbox</strong> Start from the Red Hat Developer Sandbox.</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/02-openshift-topology.png" alt="OpenShift Topology with jboss-app and nexus" />
+          <figcaption><strong>2. Topology</strong> JBoss app connected to Nexus (Lightwell proxy).</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/04-nexus-lightwell-validated.png" alt="Nexus maven-lightwell-validated browse" />
+          <figcaption><strong>3. Nexus</strong> Proxy repo with Lightwell <code>.rhlw</code> artifacts.</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/05-lightwell-validated-registry.png" alt="Lightwell validated registry index" />
+          <figcaption><strong>4. Lightwell validated</strong> Upstream remediated content index.</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/06-tekton-pipelineruns.png" alt="Successful Tekton PipelineRun" />
+          <figcaption><strong>5. Pipelines</strong> Tekton build via Nexus → Lightwell SA on the remote.</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/07-jboss-app-home.png" alt="Lightwell Java Demo application home" />
+          <figcaption><strong>6. App home</strong> Runtime page showing Lightwell-resolved <code>commons-io</code>.</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/08-devspaces-rhda-plugins.png" alt="Dev Spaces RHDA and Java plugins" />
+          <figcaption><strong>7. Dev Spaces plugins</strong> Red Hat Dependency Analytics + Java pack; <code>analyze-cves</code> running.</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/08b-devspaces-devfile-commands.png" alt="Devfile Run Task analyze-cves" />
+          <figcaption><strong>7b. Devfile commands</strong> Run Task → <code>analyze-cves</code> for RHDA on <code>pom.xml</code>.</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/09b-pipelinerun-detail.png" alt="OpenShift Pipelines PipelineRun graph" />
+          <figcaption><strong>8. Pipelines</strong> Tekton graph: clone → maven → build-push → deploy (Succeeded).</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/10-ghcr-image-tags.png" alt="GHCR demo-lightwell image tags" />
+          <figcaption><strong>9. Image registry</strong> GHCR tags <code>latest</code> / <code>contingency</code>.</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/11-artifacthub-charts.png" alt="Artifact Hub demo-lightwell Helm charts" />
+          <figcaption><strong>10. Artifact Hub</strong> Charts <code>jboss-app</code>, <code>nexus</code>, <code>devspaces-workspace</code>.</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/11b-artifacthub-security-cves.png" alt="Artifact Hub security report CVEs on WildFly image" />
+          <figcaption><strong>10b. Image scan summary</strong> Artifact Hub scans chart images (WildFly rating F) — not Lightwell Maven GAVs.</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/12-artifacthub-commons-io-cve-stock.png" alt="CVE-2024-47554 on stock commons-io in Artifact Hub" />
+          <figcaption><strong>11. Artifact Hub (image)</strong> Stock <code>commons-io:2.11.0</code> CVE in WildFly layers.</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/13-rhda-dependency-analytics-report.png" alt="Full RHDA report in Dev Spaces" />
+          <figcaption><strong>12. RHDA report</strong> Full Dependency Analytics Report on <code>.rhlw</code> deps.</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/14-demo-app-home.png" alt="Demo app home Status OK" />
+          <figcaption><strong>13. App home</strong> Runtime proof of Lightwell-resolved <code>commons-io</code>.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="charts">
+      <h2>Helm charts (Artifact Hub)</h2>
+      <p class="muted wide">
+        Each chart ships a <code>README.md</code> so Artifact Hub can render a full description.
+        Repo index: <a href="charts/">charts/</a> ·
+        <a href="https://artifacthub.io/packages/search?repo=demo-lightwell">search on Artifact Hub</a>.
+      </p>
+      <div class="stack">
+        <article class="tile">
+          <h3>demo-lightwell</h3>
+          <p>Umbrella: secrets, Nexus, JBoss, Tekton PipelineRun, optional DevWorkspace — one <code>helm upgrade --install</code>.</p>
+          <a href="https://artifacthub.io/packages/helm/demo-lightwell/demo-lightwell">Artifact Hub →</a>
+        </article>
+        <article class="tile">
+          <h3>jboss-app</h3>
+          <p>WildFly WAR + app Route + HAL console Route. Image scan on Artifact Hub uses the public WildFly base.</p>
+          <a href="https://artifacthub.io/packages/helm/demo-lightwell/jboss-app">Artifact Hub →</a>
+        </article>
+        <article class="tile">
+          <h3>nexus</h3>
+          <p>Thin Nexus + PVC; configure Job wires Lightwell proxy with SA on the remote into <code>maven-public</code>.</p>
+          <a href="https://artifacthub.io/packages/helm/demo-lightwell/nexus">Artifact Hub →</a>
+        </article>
+      </div>
+      <p class="muted" style="margin-top:1rem;">
+        Also published: <a href="https://artifacthub.io/packages/helm/demo-lightwell/devspaces-workspace">devspaces-workspace</a>
+        (DevWorkspace CR for GitOps-style IDE provisioning).
+      </p>
+    </section>
+
+    <section id="day2">
+      <h2>Day-2: validated demo → remediated (subscription)</h2>
+      <p class="muted wide">
+        This sandbox defaults to the public <strong>validated</strong> Lightwell demo index.
+        With an active Lightwell Network membership, switch Nexus + Maven to the <strong>remediated</strong> tier
+        (org service account, product URL, layout Strict) and re-run RHDA + rebuild.
+      </p>
+      <table class="gav">
+        <thead>
+          <tr><th></th><th>Demo (default)</th><th>Subscription</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tier</td>
+            <td>Validated (public pulp demo)</td>
+            <td>Remediated</td>
+          </tr>
+          <tr>
+            <td>URL</td>
+            <td><code>…/public-lightwell-demo/java/validated/</code></td>
+            <td><code>https://packages.redhat.com/lightwell/java/remediated/</code></td>
+          </tr>
+          <tr>
+            <td>Expect in RHDA</td>
+            <td>OSV findings + remediations available</td>
+            <td>Newer <code>.rhlw-*</code> builds; fewer open findings as coverage grows</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Beyond the demo</h2>
+      <div class="callout">
+        <p><strong>SLSA + SBOM (production)</strong></p>
+        <p>
+          This demo focuses on Lightwell remediations and CVE visibility.
+          Generating an <strong>SBOM</strong> and attaching <strong>SLSA</strong> build provenance
+          (attestations, policy gates) is <em>out of scope here</em>, but should be planned
+          for a production secure supply-chain.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>External references</h2>
       <ul>
+        <li><a href="https://www.redhat.com/en/lightwell">Red Hat Lightwell</a></li>
         <li><a href="https://docs.redhat.com/en/documentation/red_hat_lightwell_network/current/configure-configure_java_build_tool">Configure Java build tool (Lightwell)</a></li>
         <li><a href="https://docs.redhat.com/en/documentation/red_hat_lightwell_network/current/configure-configure_nexus_to_use_rhln_repository">Configure Nexus for Lightwell</a></li>
         <li><a href="https://docs.redhat.com/en/documentation/red_hat_trusted_profile_analyzer/1/html/quick_start_guide/configuring-visual-studio-code-to-use-dependency-analytics_qsg">Trusted Profile Analyzer / Dependency Analytics</a></li>
-        <li><a href="https://ux.redhat.com/">Red Hat design system (ux.redhat.com)</a> — tokens &amp; typography</li>
-        <li><a href="charts/">Helm chart index (Artifact Hub source)</a></li>
+        <li><a href="charts/">Helm chart index</a> (Artifact Hub source)</li>
       </ul>
     </section>
   </main>

@@ -26,25 +26,38 @@ components:
 commands:
   - id: demo-up
     exec:
-      label: "1) demo-up — Nexus + JBoss"
+      label: "1) demo-up — umbrella (Nexus + PipelineRun + DevSpaces)"
       component: tools
       workingDir: ${PROJECT_SOURCE}
-      commandLine: "bash scripts/demo-up.sh"
+      commandLine: |
+        set -euo pipefail
+        NS="$(oc project -q)"
+        INTERNAL_IMAGE="image-registry.openshift-image-registry.svc:5000/${NS}/demo-lightwell"
+        if grep -A3 '^lightwell:' charts/demo-lightwell/values.yaml | grep -q 'CHANGE_ME'; then
+          echo "ERROR: edit charts/demo-lightwell/values.yaml (lightwell.username / lightwell.token)" >&2
+          exit 1
+        fi
+        helm dependency update charts/demo-lightwell
+        helm upgrade --install demo charts/demo-lightwell \
+          --set "jboss-app.image.repository=${INTERNAL_IMAGE}" \
+          --set jboss-app.image.tag=latest \
+          --set 'jboss-app.image.pullSecrets={}' \
+          --wait --timeout 12m \
+          || echo "WARN: helm wait timed out; check pods / pipelinerun"
+        oc get pods,route,pipelinerun 2>/dev/null || true
+        echo "Pipeline builds to: ${INTERNAL_IMAGE}:latest"
+        echo "Next: open app/pom.xml → RHDA report → open-jboss-console"
       group:
         kind: build
         isDefault: true
 
   - id: analyze-cves
     exec:
-      label: "2) analyze-cves — open pom for RHDA"
+      label: "2) analyze-cves — prepare RHDA (then open report in IDE)"
       component: tools
       workingDir: ${PROJECT_SOURCE}
       commandLine: |
-        echo "Open app/pom.xml and run: Red Hat Dependency Analytics Report"
-        echo "Extension: redhat.fabric8-analytics (Trusted Profile Analyzer / Dependency Analytics)"
-        echo "Tip: right-click pom.xml → Red Hat Dependency Analytics Report"
-        ls -la app/pom.xml
-        command -v mvn >/dev/null && mvn -f app/pom.xml dependency:tree -Dverbose=false || true
+        bash scripts/rhda-prepare.sh
 
   - id: open-jboss-console
     exec:
@@ -59,8 +72,10 @@ commands:
       component: tools
       workingDir: ${PROJECT_SOURCE}
       commandLine: |
-        oc get pods,route,pvc -l app.kubernetes.io/part-of=demo-lightwell 2>/dev/null || oc get pods,route,pvc
-        oc get pipelinerun 2>/dev/null | head -n 5 || true
+        oc get pods,route,pvc,pipelinerun 2>/dev/null || oc get pods,route,pvc
+        helm list 2>/dev/null || true
+        DS_NS="$(oc project -q | sed 's/-dev$/-devspaces/')"
+        oc get devworkspace -n "${DS_NS}" 2>/dev/null || true
 
 events:
   postStart:

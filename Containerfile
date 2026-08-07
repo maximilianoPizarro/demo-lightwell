@@ -28,10 +28,14 @@ RUN if [ -f "${MAVEN_SETTINGS}" ]; then \
 FROM ${RUNTIME_IMAGE}
 USER root
 COPY --from=build /build/app/target/demo-lightwell.war /opt/jboss/wildfly/standalone/deployments/ROOT.war
+COPY scripts/wildfly-entrypoint.sh /opt/demo/wildfly-entrypoint.sh
 # Enable management console on 0.0.0.0 for demo Route
 RUN /opt/jboss/wildfly/bin/add-user.sh -u admin -p 'Admin#123' -g ManagementRealm || true \
  && sed -i 's/127.0.0.1:9990/0.0.0.0:9990/g' /opt/jboss/wildfly/standalone/configuration/standalone.xml || true \
- && sed -i 's/jboss.bind.address.management:127.0.0.1/jboss.bind.address.management:0.0.0.0/g' /opt/jboss/wildfly/standalone/configuration/standalone.xml || true
+ && sed -i 's/jboss.bind.address.management:127.0.0.1/jboss.bind.address.management:0.0.0.0/g' /opt/jboss/wildfly/standalone/configuration/standalone.xml || true \
+ && chmod 755 /opt/demo/wildfly-entrypoint.sh \
+ && chown jboss:root /opt/demo/wildfly-entrypoint.sh
 USER jboss
 EXPOSE 8080 9990
-CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]
+# MANAGEMENT_ALLOWED_ORIGINS (comma/space HTTPS origins) set by the Helm chart for HAL CORS.
+ENTRYPOINT ["/opt/demo/wildfly-entrypoint.sh"]

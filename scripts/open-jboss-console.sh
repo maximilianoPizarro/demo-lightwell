@@ -13,13 +13,14 @@ fi
 USER=$(oc get secret jboss-admin -n "${NS}" -o jsonpath='{.data.username}' 2>/dev/null | base64 -d || echo admin)
 PASS=$(oc get secret jboss-admin -n "${NS}" -o jsonpath='{.data.password}' 2>/dev/null | base64 -d || echo 'Admin#123')
 
-URL="https://${MGMT_HOST}"
+URL="https://${MGMT_HOST}/console"
 echo "JBoss Admin Console: ${URL}"
 echo "App:                 https://${APP_HOST}"
 echo "Username: ${USER}"
 echo "Password: ${PASS}"
 echo
 echo "Open the Console URL in your browser (DevSpaces: Ctrl/Cmd+click)."
+echo "If /management returns 403 with Origin, ensure MANAGEMENT_ALLOWED_ORIGINS includes https://${MGMT_HOST}."
 
 if command -v xdg-open >/dev/null; then
   xdg-open "${URL}" >/dev/null 2>&1 || true

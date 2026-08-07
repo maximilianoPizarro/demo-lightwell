@@ -3,7 +3,7 @@
 # to enable the Verified Publisher flag.
 #
 # Docs: https://artifacthub.io/docs/topics/repositories/
-repositoryID: ""
+repositoryID: "f00bf1d3-1f11-4c33-99da-e834ae179e0b"
 owners:
   - name: Maximiliano Pizarro
     email: maximiliano.pizarro.5@gmail.com

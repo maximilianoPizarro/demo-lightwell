@@ -1,5 +1,8 @@
-# Artifact Hub repository metadata (served next to Helm index.yaml on GitHub Pages)
-# https://maximilianopizarro.github.io/demo-lightwell/charts/
+# Artifact Hub repository metadata
+# After registering the Helm repo on https://artifacthub.io, paste the repository ID below
+# to enable the Verified Publisher flag.
+#
+# Docs: https://artifacthub.io/docs/topics/repositories/
 repositoryID: ""
 owners:
   - name: Maximiliano Pizarro

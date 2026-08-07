@@ -1,38 +1,50 @@
 apiVersion: v2
-name: jboss-app
-description: JBoss/WildFly deployment for the Lightwell Java demo WAR (app + management console Routes) on OpenShift.
+name: demo-lightwell
+description: Umbrella chart for the Lightwell Java demo — secrets, Nexus (Lightwell proxy), JBoss/WildFly, Tekton PipelineRun to OpenShift internal registry (optional Quay), and DevWorkspace.
 type: application
-version: 0.1.1
+version: 0.2.0
 appVersion: "1.0.0"
 home: https://maximilianopizarro.github.io/demo-lightwell/
 icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/demo-lightwell-icon.png
 keywords:
   - lightwell
+  - nexus
   - jboss
   - wildfly
-  - java
+  - tekton
   - openshift
+  - maven
+  - supply-chain
 sources:
   - https://github.com/maximilianoPizarro/demo-lightwell
 maintainers:
   - name: Maximiliano Pizarro
     email: maximiliano.pizarro.5@gmail.com
+dependencies:
+  - name: nexus
+    version: "0.1.0"
+    repository: "file://../nexus"
+  - name: jboss-app
+    version: "0.1.0"
+    repository: "file://../jboss-app"
 annotations:
   artifacthub.io/license: Apache-2.0
-  artifacthub.io/category: integration-delivery
+  artifacthub.io/category: security
   artifacthub.io/prerelease: "false"
   artifacthub.io/links: |
     - name: Documentation
       url: https://maximilianopizarro.github.io/demo-lightwell/
-    - name: Journey
+    - name: Journey (validated demo)
       url: https://github.com/maximilianoPizarro/demo-lightwell/blob/main/docs/JOURNEY.md
+    - name: Journey (remediated)
+      url: https://github.com/maximilianoPizarro/demo-lightwell/blob/main/docs/JOURNEY-REMEDIATED.md
     - name: Lightwell product
       url: https://www.redhat.com/en/lightwell
     - name: Source
       url: https://github.com/maximilianoPizarro/demo-lightwell
-  # Public base image only — app tags are built to OpenShift internal registry / GHCR
-  # (Quay :contingency is optional and may not exist; listing it breaks Artifact Hub scan).
   artifacthub.io/images: |
+    - name: nexus
+      image: docker.io/sonatype/nexus3:3.70.1
     - name: wildfly-runtime
       image: quay.io/wildfly/wildfly:27.0.1.Final-jdk17
   artifacthub.io/screenshots: |
@@ -40,6 +52,8 @@ annotations:
       url: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/lightwell-architecture.png
   artifacthub.io/changes: |
     - kind: fixed
-      description: Point Artifact Hub image scan to public WildFly base (remove missing Quay contingency tag)
+      description: Artifact Hub images use public Nexus/WildFly bases (app image is internal/GHCR)
+    - kind: changed
+      description: Auto PipelineRun to OpenShift internal registry; optional Quay push; create DevWorkspace on install
     - kind: added
-      description: Initial JBoss/WildFly chart with app and management Routes
+      description: Umbrella chart — secrets + Nexus + JBoss + Tekton in one install

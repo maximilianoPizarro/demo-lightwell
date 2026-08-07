@@ -14,6 +14,3 @@ kubeconfig
 .oc/
 *.war
 .DS_Store
-docs/charts/*.tgz
-docs/charts/index.yaml
-

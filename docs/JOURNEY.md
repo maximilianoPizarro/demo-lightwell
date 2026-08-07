@@ -28,11 +28,14 @@ Focus: **secure development** for legacy Java — remediate vulnerable third-par
 | 7. Dev Spaces — RHDA plugin | ![RHDA](journey/08-devspaces-rhda-plugins.png) |
 | 7b. Devfile commands (analyze-cves) | ![Commands](journey/08b-devspaces-devfile-commands.png) |
 | 8. OpenShift Pipelines detail | ![Pipeline detail](journey/09b-pipelinerun-detail.png) |
+| 8b. Tekton maven logs → Nexus `commons-io` `.rhlw` | ![Maven Nexus commons-io](journey/09c-tekton-maven-nexus-commons-io.png) |
+| 8c. Tekton maven logs → Nexus `.rhlw` jars | ![Maven Nexus jars](journey/09d-tekton-maven-nexus-jars.png) |
 | 9. GHCR image tags (`:contingency`) | ![GHCR](journey/10-ghcr-image-tags.png) |
 | 10. Artifact Hub charts | ![Artifact Hub](journey/11-artifacthub-charts.png) |
 | 10b. Artifact Hub Security Report (image summary) | ![Security CVEs](journey/11b-artifacthub-security-cves.png) |
 | 11. Stock commons-io CVE (not Lightwell GAV) | ![CVE-2024-47554](journey/12-artifacthub-commons-io-cve-stock.png) |
 | 12. RHDA Dependency Analytics Report | ![RHDA report](journey/13-rhda-dependency-analytics-report.png) |
+| 13. HAL server.log (`ROOT.war` deployed) | ![HAL server.log](journey/15-hal-server-log.png) |
 
 ## Proof: Artifact Hub vs Lightwell vs RHDA
 

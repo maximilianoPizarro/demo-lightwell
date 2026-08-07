@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>demo-lightwell — Lightwell Java on OpenShift Dev Spaces</title>
+  <title>Demo Lightwell: Securing Java CVEs on OpenShift Dev Spaces</title>
   <meta name="description" content="Secure Java demo: Red Hat Lightwell Network, CVE visibility (RHDA/TPA), Nexus, OpenShift Dev Spaces and Pipelines." />
   <link rel="icon" href="brand/lightwell_logo_light.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -345,6 +345,8 @@
         <a href="#rhda">RHDA report</a>
         <a href="#proof">CVE proof</a>
         <a href="#charts">Charts</a>
+        <a href="#day2">Day-2 (Prod)</a>
+        <a href="#beyond">Beyond the demo</a>
         <a href="https://artifacthub.io/packages/search?repo=demo-lightwell">Artifact Hub</a>
         <a href="https://github.com/maximilianoPizarro/demo-lightwell">GitHub</a>
       </nav>
@@ -357,7 +359,18 @@
         <div class="eyebrow">Red Hat Lightwell Network · Java demo</div>
         <h1>Secure legacy Java deps on OpenShift Dev Spaces</h1>
         <p class="lead">
-          Two planes: Artifact Hub flags stock <code>commons-io</code> inside the WildFly
+          This demo shows how to use <strong>Red Hat Lightwell</strong> to resolve vulnerable Java dependencies in a legacy app, transparently displaying CVE status without pretending they magically disappear.
+        </p>
+        <div class="callout" style="margin-bottom: 1.5rem; max-width: 38rem;">
+          <p><strong>Executive Summary (TL;DR)</strong></p>
+          <ul style="margin:0; padding-left: 1.25rem; color: var(--rh-color-text-secondary);">
+            <li><strong>What is this?</strong> An end-to-end sandbox demo of securing a Java (WildFly) app's supply chain using Lightwell, Nexus, and OpenShift Pipelines.</li>
+            <li><strong>For whom?</strong> Architects and DevSecOps exploring how Lightwell's remediated packages interact with existing IDE scanners (RHDA) and deployment workflows.</li>
+            <li><strong>What will you see?</strong> The contrast between two signals: an image scan flagging stock CVEs, versus the app safely building with Lightwell <code>.rhlw</code> coordinates via Nexus.</li>
+          </ul>
+        </div>
+        <p class="muted">
+          Under the hood: Artifact Hub flags stock <code>commons-io</code> inside the WildFly
           <a href="https://artifacthub.io/packages/helm/demo-lightwell/jboss-app?modal=security-report">image scan</a>;
           the app builds with Lightwell <code>.rhlw</code> coordinates via Nexus.
           RHDA still lists OSV findings on those GAVs — and shows Red Hat <em>remediations available</em>
@@ -479,6 +492,12 @@
           </tr>
         </tbody>
       </table>
+      <div class="callout" style="max-width:48rem; margin-bottom:1.5rem;">
+        <p><strong>⚠️ Ephemeral Demo Credentials</strong></p>
+        <p>
+          The passwords <code>Admin#123</code> and <code>admin123</code> shown above are strictly for this sandbox/demo environment. They are hardcoded/defaulted purely to make the demo reproducible and <strong>must not be reused in any real deployment</strong>.
+        </p>
+      </div>
       <div class="callout" style="max-width:48rem;">
         <p><strong>HAL console notes</strong></p>
         <p>
@@ -496,6 +515,15 @@
         <img class="proof-shot" src="journey/14-demo-app-home.png" alt="Lightwell Java Demo app home showing commons-io rhlw version" style="background:#fff;" />
         <figcaption class="proof-caption">
           App home: Status OK and Lightwell-resolved <code>commons-io:2.11.0.rhlw-00001</code>.
+        </figcaption>
+      </figure>
+      <figure style="margin-top:1.25rem;">
+        <img class="proof-shot" src="journey/15-hal-server-log.png" alt="HAL server.log with ROOT.war deployed" style="background:#fff;" />
+        <figcaption class="proof-caption">
+          HAL → Runtime → Log Files → <code>server.log</code>:
+          <code>Deployed "ROOT.war"</code>, web context <code>/</code>, WildFly started
+          (<a href="https://jboss-app-mgmt-maximilianopizarro5-dev.apps.rm2.thpm.p1.openshiftapps.com/console/index.html#runtime;path=standalone-server-column~standalone-host-jboss-app-7b5f78b8bf-gp2gk!rss~logging!lf~serverlog">open live Server Log</a>;
+          pod name in the hash may change after redeploy).
         </figcaption>
       </figure>
     </section>
@@ -649,6 +677,14 @@
           <figcaption><strong>8. Pipelines</strong> Tekton graph: clone → maven → build-push → deploy (Succeeded).</figcaption>
         </figure>
         <figure class="journey-card">
+          <img src="journey/09c-tekton-maven-nexus-commons-io.png" alt="Tekton maven task log Downloaded commons-io from Nexus maven-lightwell-validated" />
+          <figcaption><strong>8b. Maven → Nexus</strong> Task logs: <code>Downloaded from maven-lightwell-validated</code> — <code>commons-io:2.11.0.rhlw-00001</code> via <code>http://nexus:8081/…</code>.</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/09d-tekton-maven-nexus-jars.png" alt="Tekton maven task log downloading rhlw jars from Nexus" />
+          <figcaption><strong>8c. Lightwell jars</strong> Same task: <code>.rhlw</code> POMs/JARs resolved from Nexus (checksum warn is expected).</figcaption>
+        </figure>
+        <figure class="journey-card">
           <img src="journey/10-ghcr-image-tags.png" alt="GHCR demo-lightwell image tags" />
           <figcaption><strong>9. Image registry</strong> GHCR tags <code>latest</code> / <code>contingency</code>.</figcaption>
         </figure>
@@ -657,20 +693,36 @@
           <figcaption><strong>10. Artifact Hub</strong> Charts <code>jboss-app</code>, <code>nexus</code>, <code>devspaces-workspace</code>.</figcaption>
         </figure>
         <figure class="journey-card">
-          <img src="journey/11b-artifacthub-security-cves.png" alt="Artifact Hub security report CVEs on WildFly image" />
+          <div style="padding: 2rem; text-align: center; background: var(--rh-color-surface-subtle); display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--rh-color-border); height: 260px;">
+            <p><strong>Artifact Hub UI showing CVE-2024-47554</strong></p>
+            <a class="btn btn-secondary" href="#proof">See Image Scan Proof ↓</a>
+          </div>
           <figcaption><strong>10b. Image scan summary</strong> Artifact Hub scans chart images (WildFly rating F) — not Lightwell Maven GAVs.</figcaption>
         </figure>
         <figure class="journey-card">
-          <img src="journey/12-artifacthub-commons-io-cve-stock.png" alt="CVE-2024-47554 on stock commons-io in Artifact Hub" />
+          <div style="padding: 2rem; text-align: center; background: var(--rh-color-surface-subtle); display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--rh-color-border); height: 260px;">
+            <p><strong>Stock commons-io CVE details</strong></p>
+            <a class="btn btn-secondary" href="#proof">See CVE Proof ↓</a>
+          </div>
           <figcaption><strong>11. Artifact Hub (image)</strong> Stock <code>commons-io:2.11.0</code> CVE in WildFly layers.</figcaption>
         </figure>
         <figure class="journey-card">
-          <img src="journey/13-rhda-dependency-analytics-report.png" alt="Full RHDA report in Dev Spaces" />
+          <div style="padding: 2rem; text-align: center; background: var(--rh-color-surface-subtle); display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--rh-color-border); height: 260px;">
+            <p><strong>Full Dependency Analytics Report</strong></p>
+            <a class="btn btn-secondary" href="#rhda">See RHDA Report ↓</a>
+          </div>
           <figcaption><strong>12. RHDA report</strong> Full Dependency Analytics Report on <code>.rhlw</code> deps.</figcaption>
         </figure>
         <figure class="journey-card">
-          <img src="journey/14-demo-app-home.png" alt="Demo app home Status OK" />
+          <div style="padding: 2rem; text-align: center; background: var(--rh-color-surface-subtle); display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--rh-color-border); height: 260px;">
+            <p><strong>App Runtime Endpoint Status</strong></p>
+            <a class="btn btn-secondary" href="#access">See App Status ↓</a>
+          </div>
           <figcaption><strong>13. App home</strong> Runtime proof of Lightwell-resolved <code>commons-io</code>.</figcaption>
+        </figure>
+        <figure class="journey-card">
+          <img src="journey/15-hal-server-log.png" alt="HAL Management Console server.log showing ROOT.war deployed" />
+          <figcaption><strong>14. HAL server.log</strong> Runtime → Log Files → <code>server.log</code>: <code>Deployed "ROOT.war"</code> and WildFly started.</figcaption>
         </figure>
       </div>
     </section>
@@ -736,7 +788,7 @@
       </table>
     </section>
 
-    <section>
+    <section id="beyond">
       <h2>Beyond the demo</h2>
       <div class="callout">
         <p><strong>SLSA + SBOM (production)</strong></p>

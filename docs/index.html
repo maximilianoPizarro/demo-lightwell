@@ -96,9 +96,10 @@
       display: flex;
       align-items: center;
       flex: 1 1 auto;
+      justify-content: flex-end;
       flex-wrap: nowrap;
-      gap: 0.85rem;
-      font-size: 0.82rem;
+      gap: 1.1rem;
+      font-size: 0.9rem;
       min-width: 0;
     }
     .bar nav a {
@@ -111,8 +112,8 @@
     .nav-primary {
       display: flex;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 0.15rem 0.85rem;
+      flex-wrap: nowrap;
+      gap: 1.1rem;
       min-width: 0;
     }
     .nav-more-panel { display: none; }
@@ -133,14 +134,15 @@
       position: absolute;
       right: 0;
       top: calc(100% + 0.45rem);
-      min-width: 12.5rem;
+      min-width: 13.5rem;
       background: #fff;
       border: 1px solid var(--rh-color-border);
       border-radius: 6px;
       box-shadow: 0 10px 28px rgba(21,21,21,.12);
-      padding: 0.4rem;
+      padding: 0.45rem;
       z-index: 30;
     }
+    .nav-more-panel a + a { border-top: 1px solid transparent; }
     .nav-more[open] > .nav-more-panel {
       display: flex;
       flex-direction: column;
@@ -210,12 +212,37 @@
       text-transform: uppercase;
       color: var(--rh-color-brand-red);
     }
+    .tldr {
+      margin: 0 0 1.1rem;
+      padding: 0.85rem 1rem;
+      background: #fff;
+      border: 1px solid var(--rh-color-border);
+      border-left: 4px solid var(--rh-color-brand-red);
+      border-radius: 0 6px 6px 0;
+      font-size: 1.05rem;
+      line-height: 1.45;
+      max-width: 48rem;
+      color: var(--rh-color-text-primary);
+    }
+    .tldr strong { font-weight: 700; }
     .cta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-top: auto;
+    }
+    .cta-primary { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+    .cta-secondary {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.65rem;
-      margin-top: auto;
+      gap: 0.5rem;
+    }
+    .cta-secondary .btn {
+      padding: 0.5rem 0.85rem;
+      font-size: 0.85rem;
+      font-weight: 600;
     }
     .btn {
       display: inline-flex;
@@ -271,12 +298,7 @@
       line-height: 1.45;
     }
     .hero-aside .callout li + li { margin-top: 0.4rem; }
-    @media (max-width: 1180px) {
-      .bar nav { gap: 0.65rem; font-size: 0.78rem; }
-      .nav-primary { gap: 0.1rem 0.65rem; }
-      .nav-ext { gap: 0.65rem; }
-    }
-    @media (max-width: 960px) {
+    @media (max-width: 720px) {
       .nav-toggle { display: inline-flex; }
       .bar { flex-wrap: wrap; }
       .bar nav {
@@ -323,9 +345,10 @@
       .cta .btn { flex: 1 1 auto; justify-content: center; }
     }
     @media (max-width: 560px) {
-      .cta .btn { width: 100%; }
+      .cta-primary, .cta-secondary { width: 100%; }
+      .cta-secondary .btn { flex: 1 1 auto; justify-content: center; }
       .btn-devspaces { width: 100%; justify-content: center; }
-      .btn-devspaces img { height: 34px; }
+      .btn-devspaces img { height: 40px; width: auto; max-width: 100%; }
     }
     section { margin: 2.75rem 0; }
     h2 {
@@ -574,12 +597,59 @@
       display: inline-flex;
       align-items: center;
       line-height: 0;
-      border-radius: 3px;
+      border-radius: 4px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(238, 0, 0, 0.25);
+      box-shadow: 0 4px 16px rgba(238, 0, 0, 0.35);
+      outline: 2px solid var(--rh-color-brand-red);
+      outline-offset: 2px;
+      transform: scale(1.02);
     }
-    .btn-devspaces img { height: 36px; width: auto; display: block; }
-    .btn-devspaces:hover { opacity: 0.92; }
+    .btn-devspaces img { height: 44px; width: auto; display: block; }
+    .btn-devspaces:hover { opacity: 0.95; outline-color: var(--rh-color-brand-red-dark); }
+    .cta-hint {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--rh-color-text-secondary);
+    }
+    .demo-warn {
+      border-left-color: #c9190b;
+      background: #fff8f7;
+      max-width: 52rem;
+    }
+    .demo-warn p { color: var(--rh-color-text-primary); }
+    .cred-reveal {
+      margin: 0.75rem 0 1.25rem;
+      max-width: 52rem;
+      background: #fff;
+      border: 1px solid var(--rh-color-border);
+      border-radius: 6px;
+      padding: 0.65rem 0.9rem;
+    }
+    .cred-reveal summary {
+      cursor: pointer;
+      font-weight: 700;
+      font-family: var(--rh-font-display);
+      font-size: 0.95rem;
+    }
+    .cred-reveal[open] summary { margin-bottom: 0.5rem; }
+    .cred-reveal code { color: #a30000; }
+    .proof-link {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem 1rem;
+      margin: 1rem 0 1.25rem;
+      padding: 0.9rem 1rem;
+      background: #fff;
+      border: 1px solid var(--rh-color-border);
+      border-radius: 8px;
+      max-width: 48rem;
+    }
+    .proof-link p { margin: 0; color: var(--rh-color-text-secondary); font-size: 0.95rem; flex: 1 1 12rem; }
+    .badges img {
+      height: 22px;
+      opacity: 0.95;
+    }
     code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 0.9em;
@@ -779,21 +849,21 @@
           <a href="#journey">Journey</a>
           <a href="#run">Run</a>
           <a href="#access">Access</a>
-          <a href="#charts">Charts</a>
-          <a href="#proof">CVE proof</a>
         </div>
         <details class="nav-more" id="nav-more">
-          <summary>More</summary>
+          <summary>Docs</summary>
           <div class="nav-more-panel">
-            <a href="#glossary">Glossary</a>
-            <a href="#nexus-tekton">Nexus + Tekton</a>
+            <a href="#proof">CVE proof</a>
             <a href="#rhda">RHDA report</a>
+            <a href="#nexus-tekton">Nexus + Tekton</a>
+            <a href="#charts">Helm charts</a>
+            <a href="#glossary">Glossary</a>
             <a href="#day2">Day-2 (Prod)</a>
             <a href="#beyond">Beyond the demo</a>
+            <a href="https://artifacthub.io/packages/search?repo=demo-lightwell">Artifact Hub</a>
           </div>
         </details>
         <div class="nav-ext">
-          <a href="https://artifacthub.io/packages/search?repo=demo-lightwell">Artifact Hub</a>
           <a href="https://github.com/maximilianoPizarro/demo-lightwell">GitHub</a>
         </div>
       </nav>
@@ -808,47 +878,56 @@
         <p class="byline">
           by Maximiliano Pizarro, Specialist Solution Architect at Red Hat LATAM
         </p>
-        <p class="lead">
-          This demo shows how to use <strong>Red Hat Lightwell</strong> to resolve vulnerable Java dependencies in a legacy app, transparently displaying CVE status without pretending they magically disappear.
+        <p class="tldr">
+          <strong>TL;DR:</strong> This sandbox demo shows how
+          <a href="https://www.redhat.com/en/lightwell">Red Hat Lightwell Network</a>
+          remediates vulnerable Java deps via Nexus on OpenShift — for architects and DevSecOps.
+          Expect ~15–20 minutes: open Dev Spaces, run three tasks, then compare image-scan CVEs vs Lightwell <code>.rhlw</code> coordinates (RHDA will not go “all green”).
         </p>
-        <p class="muted">
-          Under the hood: Artifact Hub flags stock <code>commons-io</code> inside the WildFly
-          <a href="https://artifacthub.io/packages/helm/demo-lightwell/jboss-app?modal=security-report">image scan</a>;
-          the app builds with Lightwell <code>.rhlw</code> coordinates via Nexus.
-          RHDA still lists OSV findings on those GAVs — and shows Red Hat <em>remediations available</em>
-          (not an all-green “zero CVE” badge on the demo validated tier).
+        <p class="lead">
+          The subtle point: Artifact Hub may flag stock <code>commons-io</code> in the WildFly
+          <a href="https://artifacthub.io/packages/helm/demo-lightwell/jboss-app?modal=security-report">image scan</a>,
+          while the app itself builds with Lightwell <code>.rhlw</code> via Nexus — two different planes, both honest.
         </p>
         <div class="cta">
-          <a class="btn-devspaces" href="https://workspaces.openshift.com/#https://github.com/maximilianoPizarro/demo-lightwell" title="Open in Red Hat OpenShift Dev Spaces">
-            <img alt="Open in Dev Spaces" src="https://img.shields.io/badge/Open_in-Dev_Spaces-EE0000?logo=redhat&amp;style=for-the-badge" height="36" />
-          </a>
-          <a class="btn btn-primary" href="#run">3-step journey</a>
-          <a class="btn btn-secondary" href="#access">App &amp; console access</a>
-          <a class="btn btn-secondary" href="#charts">Helm charts</a>
+          <p class="cta-hint">Primary action — run the demo in the cloud IDE:</p>
+          <div class="cta-primary">
+            <a class="btn-devspaces" href="https://workspaces.openshift.com/#https://github.com/maximilianoPizarro/demo-lightwell" title="Open in Red Hat OpenShift Dev Spaces">
+              <img alt="Open in Dev Spaces" src="https://img.shields.io/badge/Open_in-Dev_Spaces-A30000?logo=redhat&amp;style=for-the-badge" height="44" />
+            </a>
+          </div>
+          <div class="cta-secondary">
+            <a class="btn btn-secondary" href="#run">3-step journey</a>
+            <a class="btn btn-secondary" href="#access">App &amp; console access</a>
+            <a class="btn btn-secondary" href="#charts">Helm charts</a>
+            <a class="btn btn-secondary" href="#proof">CVE proof</a>
+          </div>
         </div>
-        <div class="badges">
-          <img alt="License" src="https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square" />
-          <img alt="Helm" src="https://img.shields.io/badge/Helm-charts-0F1689?style=flat-square&amp;logo=helm&amp;logoColor=white" />
-          <img alt="Pipelines" src="https://img.shields.io/badge/OpenShift-Pipelines-EE0000?style=flat-square" />
-          <img alt="Quay" src="https://img.shields.io/badge/Quay-latest%20%7C%20contingency-40B4E5?style=flat-square" />
-          <img alt="Lightwell" src="https://img.shields.io/badge/Lightwell-validated%20demo-EE0000?style=flat-square" />
-          <img alt="CVE proof" src="https://img.shields.io/badge/CVE--2024--47554-stock%20vs%20.rhlw-c9190b?style=flat-square" />
+        <div class="badges" aria-label="Stack badges">
+          <img alt="License Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-0b5fff?style=flat-square&amp;labelColor=151515" />
+          <img alt="Helm charts" src="https://img.shields.io/badge/Helm-charts-0F1689?style=flat-square&amp;logo=helm&amp;logoColor=white&amp;labelColor=151515" />
+          <img alt="OpenShift Pipelines" src="https://img.shields.io/badge/OpenShift-Pipelines-A30000?style=flat-square&amp;labelColor=151515" />
+          <img alt="Quay latest and contingency" src="https://img.shields.io/badge/Quay-latest%20%7C%20contingency-007b9c?style=flat-square&amp;labelColor=151515" />
+          <img alt="Lightwell validated demo" src="https://img.shields.io/badge/Lightwell-validated%20demo-A30000?style=flat-square&amp;labelColor=151515" />
+          <img alt="CVE-2024-47554 stock vs rhlw" src="https://img.shields.io/badge/CVE--2024--47554-stock%20vs%20.rhlw-8a0000?style=flat-square&amp;labelColor=151515" />
         </div>
       </div>
       <aside class="hero-aside">
         <div class="logo-card">
           <img class="lw" src="brand/lightwell_logo_light.svg" alt="Official Red Hat Lightwell logo" />
           <p class="muted" style="margin:0;text-align:center;font-size:0.85rem;">
-            Official Lightwell mark from
-            <a href="https://www.redhat.com/en/lightwell">redhat.com/en/lightwell</a>
+            Product brand: <strong>Lightwell</strong> /
+            <a href="https://www.redhat.com/en/lightwell">Lightwell Network</a>
+            (GA offering; see also docs under
+            <a href="https://docs.redhat.com/en/documentation/lightwell_network/current">Lightwell Network</a>).
           </p>
         </div>
         <div class="callout">
-          <p><strong>Executive Summary (TL;DR)</strong></p>
+          <p><strong>At a glance</strong></p>
           <ul>
-            <li><strong>What is this?</strong> An end-to-end sandbox demo of securing a Java (WildFly) app's supply chain using Lightwell, Nexus, and OpenShift Pipelines.</li>
-            <li><strong>For whom?</strong> Architects and DevSecOps exploring how Lightwell's remediated packages interact with existing IDE scanners (RHDA) and deployment workflows.</li>
-            <li><strong>What will you see?</strong> The contrast between two signals: an image scan flagging stock CVEs, versus the app safely building with Lightwell <code>.rhlw</code> coordinates via Nexus.</li>
+            <li><strong>What:</strong> End-to-end WildFly supply-chain demo — Lightwell + Nexus + Pipelines + Dev Spaces.</li>
+            <li><strong>Who:</strong> Architects / DevSecOps evaluating Lightwell remediations vs IDE scanners (RHDA/TPA).</li>
+            <li><strong>Outcome:</strong> Image scan ≠ app GAV. You will see stock CVEs on WildFly layers and <code>.rhlw</code> on the app path — by design.</li>
           </ul>
         </div>
       </aside>
@@ -991,14 +1070,14 @@
             </figcaption>
           </figure>
           <figure class="journey-slide" data-slide="15" role="group" aria-roledescription="slide" aria-label="16 of 18" hidden>
-            <div class="slide-cta">
-              <p><strong>Full Dependency Analytics Report</strong></p>
-              <a class="btn btn-secondary" href="#rhda">See RHDA Report ↓</a>
-            </div>
+            <img src="journey/13-rhda-dependency-analytics-report.png" alt="Full Red Hat Dependency Analytics Report in Dev Spaces" />
             <figcaption>
               <span class="slide-num">Step 12</span>
               <strong>RHDA report</strong>
-              <span class="desc">Full Dependency Analytics Report on <code>.rhlw</code> deps.</span>
+              <span class="desc">
+                Remediations available on <code>.rhlw</code> deps — not an all-green zero-CVE badge.
+                <a href="#rhda">How to run RHDA ↓</a>
+              </span>
             </figcaption>
           </figure>
           <figure class="journey-slide" data-slide="16" role="group" aria-roledescription="slide" aria-label="17 of 18" hidden>
@@ -1235,47 +1314,65 @@ Contrast — GitHub Actions contingency path (no Nexus):
 
     <section id="access">
       <h2>Access — app &amp; JBoss / WildFly console</h2>
+      <div class="callout demo-warn" style="margin-bottom:1.25rem;">
+        <p><strong>Demo / sandbox only — not production credentials</strong></p>
+        <p>
+          Passwords below are <strong>ephemeral chart defaults</strong> for Developer Sandbox reproducibility.
+          They rotate when the sandbox expires, are unsuitable for any shared or production cluster, and are a
+          <em>bad pattern to copy</em> into real supply-chain work. Prefer generating secrets at install time
+          (<code>helm … --set</code> / sealed secrets) outside this demo.
+        </p>
+      </div>
       <p class="muted wide">
-        Live Developer Sandbox project <code>maximilianopizarro5-dev</code> (adjust namespace/host for your cluster).
-        Management credentials come from Secret <code>jboss-admin</code> (baked into the image via <code>add-user.sh</code>).
+        Example live Routes from a <strong>Developer Sandbox</strong> project (ephemeral; your namespace and cluster host will differ).
+        Pattern: <code>https://&lt;route&gt;-&lt;namespace&gt;.apps.&lt;cluster&gt;/</code>.
+        Discover yours with <code>oc get route -n &lt;namespace&gt;</code>.
+        Management user comes from Secret <code>jboss-admin</code> (see chart / <code>add-user.sh</code>).
       </p>
       <table class="gav">
         <thead>
           <tr>
             <th>Surface</th>
-            <th>URL</th>
-            <th>Credentials</th>
+            <th>Example URL pattern</th>
+            <th>Auth</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>App home</td>
-            <td><a href="https://jboss-app-maximilianopizarro5-dev.apps.rm2.thpm.p1.openshiftapps.com/">jboss-app-…/ </a></td>
+            <td><code>jboss-app-&lt;ns&gt;.apps.…/</code> · <a href="https://jboss-app-maximilianopizarro5-dev.apps.rm2.thpm.p1.openshiftapps.com/">open example</a></td>
             <td>none</td>
           </tr>
           <tr>
             <td>Health JSON</td>
-            <td><a href="https://jboss-app-maximilianopizarro5-dev.apps.rm2.thpm.p1.openshiftapps.com/health">…/health</a></td>
+            <td><code>…/health</code> · <a href="https://jboss-app-maximilianopizarro5-dev.apps.rm2.thpm.p1.openshiftapps.com/health">open example</a></td>
             <td>none — expect <code>commons-io: 2.11.0.rhlw-00001</code></td>
           </tr>
           <tr>
             <td>HAL Management Console</td>
-            <td><a href="https://jboss-app-mgmt-maximilianopizarro5-dev.apps.rm2.thpm.p1.openshiftapps.com/console">jboss-app-mgmt-…/console</a></td>
-            <td><code>admin</code> / <code>Admin#123</code></td>
+            <td><code>jboss-app-mgmt-&lt;ns&gt;.apps.…/console</code> · <a href="https://jboss-app-mgmt-maximilianopizarro5-dev.apps.rm2.thpm.p1.openshiftapps.com/console">open example</a></td>
+            <td>Secret <code>jboss-admin</code> (reveal below)</td>
           </tr>
           <tr>
             <td>Nexus UI</td>
-            <td><a href="https://nexus-maximilianopizarro5-dev.apps.rm2.thpm.p1.openshiftapps.com/">nexus-…/</a></td>
-            <td>demo admin (chart default <code>admin123</code>)</td>
+            <td><code>nexus-&lt;ns&gt;.apps.…/</code> · <a href="https://nexus-maximilianopizarro5-dev.apps.rm2.thpm.p1.openshiftapps.com/">open example</a></td>
+            <td>chart demo admin (reveal below)</td>
           </tr>
         </tbody>
       </table>
-      <div class="callout" style="max-width:48rem; margin-bottom:1.5rem;">
-        <p><strong>⚠️ Ephemeral Demo Credentials</strong></p>
-        <p>
-          The passwords <code>Admin#123</code> and <code>admin123</code> shown above are strictly for this sandbox/demo environment. They are hardcoded/defaulted purely to make the demo reproducible and <strong>must not be reused in any real deployment</strong>.
+      <details class="cred-reveal">
+        <summary>Reveal ephemeral demo passwords (sandbox only)</summary>
+        <p class="muted" style="margin:0 0 0.5rem;">Collapsed on purpose — bad practice to lead with secrets on a supply-chain page.</p>
+        <ul style="margin:0; padding-left:1.2rem; color:var(--rh-color-text-secondary);">
+          <li>HAL / WildFly (<code>jboss-admin</code>): <code>admin</code> / <code>Admin#123</code></li>
+          <li>Nexus UI (chart default): <code>admin</code> / <code>admin123</code></li>
+        </ul>
+        <p class="muted" style="margin:0.65rem 0 0; font-size:0.85rem;">
+          Prefer reading from the cluster when possible:
+          <code>oc get secret jboss-admin -o jsonpath='{.data.password}' | base64 -d</code>.
+          For your own installs, override with generated secrets — do not copy these values into production.
         </p>
-      </div>
+      </details>
 
       <details class="troubleshooting">
         <summary>HAL Console troubleshooting: 403 or "Authentication required"</summary>
@@ -1326,19 +1423,13 @@ Contrast — GitHub Actions contingency path (no Nexus):
         Settings live in <code>.vscode/settings.json</code>
         (<code>redHatDependencyAnalytics.reportFilePath</code>, backend URL, Maven <code>-s .m2/settings.xml</code>).
       </p>
-      <figure>
-        <img
-          class="proof-shot"
-          src="journey/13-rhda-dependency-analytics-report.png"
-          alt="Full Red Hat Dependency Analytics Report in Dev Spaces"
-        />
-        <figcaption class="proof-caption">
-          Live Dev Spaces report: dependencies already on Lightwell coordinates
-          (<code>2.11.0.rhlw-00001</code> / <code>1.4.0.rhlw-00001</code>).
-          Green banner = <strong>remediations available</strong>; table still lists Direct Vulnerabilities from OSV
-          (validated demo is not an all-green “zero CVE” badge).
-        </figcaption>
-      </figure>
+      <div class="proof-link">
+        <p>
+          Full RHDA report screenshot is in the journey carousel (single copy on the page).
+          Green banner = remediations available; table may still list OSV Direct Vulnerabilities on <code>.rhlw</code> rows.
+        </p>
+        <a class="btn btn-secondary" href="#journey-slide-15">View journey slide →</a>
+      </div>
     </section>
 
     <section id="proof">
@@ -1397,17 +1488,14 @@ Contrast — GitHub Actions contingency path (no Nexus):
         </tbody>
       </table>
 
-      <figure>
-        <img
-          class="proof-shot"
-          src="journey/12-artifacthub-commons-io-cve-stock.png"
-          alt="Artifact Hub Security Report showing CVE-2024-47554 for stock commons-io 2.11.0"
-        />
-        <figcaption class="proof-caption">
-          Artifact Hub: High CVE on stock <code>commons-io</code> 2.11.0 inside the WildFly image
-          (not the Lightwell Maven GAV).
-        </figcaption>
-      </figure>
+      <div class="proof-link">
+        <p>
+          Screenshot of the Artifact Hub stock <code>commons-io</code> CVE lives in the journey
+          (avoids duplicating the same image here).
+        </p>
+        <a class="btn btn-secondary" href="#journey-slide-14">View journey slide →</a>
+        <a class="btn btn-secondary" href="https://artifacthub.io/packages/helm/demo-lightwell/jboss-app?modal=security-report">Open Security Report →</a>
+      </div>
 
       <div class="callout" style="margin-top:1.5rem;max-width:48rem;">
         <p><strong>Why it is not all green</strong></p>
@@ -1541,7 +1629,7 @@ Contrast — GitHub Actions contingency path (no Nexus):
       document.addEventListener("click", function (e) {
         if (!more || !more.open) return;
         if (more.contains(e.target)) return;
-        if (window.matchMedia("(max-width: 960px)").matches) return;
+        if (window.matchMedia("(max-width: 720px)").matches) return;
         more.open = false;
       });
     })();
@@ -1614,6 +1702,16 @@ Contrast — GitHub Actions contingency path (no Nexus):
         if (user && !fsOpen) restart();
       }
 
+      function applyJourneyHash() {
+        var m = (location.hash || "").match(/^#journey-slide-(\d+)$/);
+        if (!m) return;
+        var n = parseInt(m[1], 10);
+        if (isNaN(n) || n < 0 || n >= slides.length) return;
+        go(n, true);
+        root.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+      }
+      window.addEventListener("hashchange", applyJourneyHash);
+
       function next() { go(index + 1, false); }
       function prev() { go(index - 1, false); }
 
@@ -1665,6 +1763,7 @@ Contrast — GitHub Actions contingency path (no Nexus):
 
       go(0, false);
       restart();
+      applyJourneyHash();
     })();
   </script>
 </body>

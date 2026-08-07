@@ -129,10 +129,10 @@ On every push to `main`, [`.github/workflows/release-image.yml`](.github/workflo
 
 | Registry | Image | Tags |
 |----------|--------|------|
-| **Quay** | `secrets.QUAY_IMAGE` or `quay.io/maximilianopizarro/demo-lightwell` | `latest`, `contingency`, `sha-<short>` |
+| **Quay** | `secrets.QUAY_IMAGE` (default `quay.io/maximilianopizarro/demo-ligthwell`) | `latest`, `contingency`, `sha-<short>` |
 | **GHCR** | `ghcr.io/<owner>/demo-lightwell` | same |
 
-Forks only need to set their own Quay secrets (`QUAY_USERNAME`, `QUAY_PASSWORD`, optional `QUAY_IMAGE`) plus Lightwell credentials.
+Forks only need their own Quay secrets (`QUAY_USERNAME`, `QUAY_PASSWORD`, optional `QUAY_IMAGE`) plus Lightwell credentials.
 
 ## License / demo notice
 

@@ -18,7 +18,8 @@ env:
   LIGHTWELL_DEMO_URL: https://packages.redhat.com/api/pulp-content/public-lightwell-demo/java/validated/
   QUAY_REGISTRY: quay.io
   QUAY_NAMESPACE: maximilianopizarro
-  IMAGE_NAME: demo-lightwell
+  # Matches the Quay repository the robot already has Write on (override with QUAY_IMAGE).
+  IMAGE_NAME: demo-ligthwell
 
 jobs:
   maven-lightwell:
@@ -169,43 +170,8 @@ jobs:
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}
 
-      - name: Ensure Quay repository exists
-        env:
-          QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-          QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
-          QUAY_NS: ${{ steps.meta.outputs.quay_ns }}
-          QUAY_REPO: ${{ steps.meta.outputs.quay_repo }}
-        run: |
-          set -euo pipefail
-          # Robot token for Quay API (Bearer). Basic auth triggers CSRF on quay.io.
-          HDR=(-H "Authorization: Bearer ${QUAY_PASSWORD}" -H "Content-Type: application/json")
-          CODE=$(curl -sS -o /tmp/quay-repo.json -w "%{http_code}" \
-            "${HDR[@]}" "https://quay.io/api/v1/repository/${QUAY_NS}/${QUAY_REPO}" || true)
-          echo "GET repository HTTP ${CODE}"
-          if [ "${CODE}" = "200" ]; then
-            echo "Quay repository ${QUAY_NS}/${QUAY_REPO} already exists"
-          else
-            echo "Creating Quay repository ${QUAY_NS}/${QUAY_REPO}..."
-            HTTP=$(curl -sS -o /tmp/quay-create.json -w "%{http_code}" \
-              "${HDR[@]}" \
-              -d "{\"repository\":\"${QUAY_REPO}\",\"visibility\":\"public\",\"description\":\"Lightwell Java demo\",\"namespace\":\"${QUAY_NS}\"}" \
-              "https://quay.io/api/v1/repository" || true)
-            echo "POST repository HTTP ${HTTP}"
-            cat /tmp/quay-create.json || true
-            if [ "${HTTP}" != "201" ] && [ "${HTTP}" != "200" ]; then
-              echo "Create returned ${HTTP}; continuing (docker push will confirm Write)."
-            fi
-          fi
-          HTTP=$(curl -sS -o /tmp/quay-perm.json -w "%{http_code}" \
-            "${HDR[@]}" -X PUT \
-            -d '{"role":"write"}' \
-            "https://quay.io/api/v1/repository/${QUAY_NS}/${QUAY_REPO}/permissions/user/${QUAY_USERNAME}" || true)
-          echo "PUT robot write permission HTTP ${HTTP}"
-          cat /tmp/quay-perm.json || true
-
       - name: Build and push to Quay
         id: quay_push
-        continue-on-error: true
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -217,14 +183,9 @@ jobs:
             ${{ steps.meta.outputs.quay_sha }}
 
       - name: Release summary
-        if: always()
         run: |
           {
             echo "## Release images"
+            echo "- **Quay:** \`${{ steps.meta.outputs.quay_contingency }}\` (also \`latest\`, \`sha-…\`)"
             echo "- **GHCR:** \`${{ steps.meta.outputs.ghcr_contingency }}\`"
-            if [ "${{ steps.quay_push.outcome }}" = "success" ]; then
-              echo "- **Quay:** \`${{ steps.meta.outputs.quay_contingency }}\` (also \`latest\`, \`sha-…\`)"
-            else
-              echo "- **Quay:** push did not succeed for \`${{ steps.meta.outputs.quay }}\` — check robot Write on that repository (secrets \`QUAY_USERNAME\` / \`QUAY_PASSWORD\` / \`QUAY_IMAGE\`)."
-            fi
           } >> "$GITHUB_STEP_SUMMARY"

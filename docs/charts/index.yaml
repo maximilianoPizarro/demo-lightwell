@@ -7,10 +7,10 @@ entries:
       artifacthub.io/prerelease: "false"
     apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-08-07T18:44:12.359064892Z"
+    created: "2026-08-07T18:54:11.775262394Z"
     description: Helm chart to deploy a DevWorkspace CR for the Lightwell demo, enabling
       GitOps/Helm-based provisioning of OpenShift Dev Spaces environments.
-    digest: 95940e17202ba80ec2fb2e568d7c9daea1fdcec7386982da982835f698f4d844
+    digest: 5d09f1c96b227c1c6a88bd1fbdbff0e8e880036c4c8594eadb3a0a296cd2e77b
     home: https://maximilianopizarro.github.io/demo-lightwell/
     icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/openshift-dev-spaces.svg
     keywords:
@@ -32,11 +32,13 @@ entries:
   - annotations:
       artifacthub.io/category: integration-delivery
       artifacthub.io/changes: |
+        - kind: fixed
+          description: Point Artifact Hub image scan to public WildFly base (remove missing Quay contingency tag)
         - kind: added
           description: Initial JBoss/WildFly chart with app and management Routes
       artifacthub.io/images: |
-        - name: app
-          image: quay.io/maximilianopizarro/demo-lightwell:contingency
+        - name: wildfly-runtime
+          image: quay.io/wildfly/wildfly:27.0.1.Final-jdk17
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
         - name: Documentation
@@ -53,10 +55,10 @@ entries:
           url: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/lightwell-architecture.png
     apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-08-07T18:44:12.359457414Z"
+    created: "2026-08-07T18:54:11.775624822Z"
     description: JBoss/WildFly deployment for the Lightwell Java demo WAR (app + management
       console Routes) on OpenShift.
-    digest: 31cfccdc5ac4fe230268f1adc60478c665f034b18d3c2424ceb5d40ab429177b
+    digest: ee84a75edb732d40b34b4c9556490c87bdddd7faf45cccff59320d6773cd8a2d
     home: https://maximilianopizarro.github.io/demo-lightwell/
     icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/demo-lightwell-icon.png
     keywords:
@@ -73,8 +75,8 @@ entries:
     - https://github.com/maximilianoPizarro/demo-lightwell
     type: application
     urls:
-    - https://maximilianopizarro.github.io/demo-lightwell/charts/jboss-app-0.1.0.tgz
-    version: 0.1.0
+    - https://maximilianopizarro.github.io/demo-lightwell/charts/jboss-app-0.1.1.tgz
+    version: 0.1.1
   nexus:
   - annotations:
       artifacthub.io/category: security
@@ -104,11 +106,11 @@ entries:
           url: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/lightwell-architecture.png
     apiVersion: v2
     appVersion: 3.70.1
-    created: "2026-08-07T18:44:12.359889288Z"
+    created: "2026-08-07T18:54:11.776031593Z"
     description: Lightweight Nexus Repository OSS (single pod + PVC) proxying Red
       Hat Lightwell Maven validated/remediated tiers for the demo-lightwell journey
       on OpenShift Dev Spaces.
-    digest: d7c7d6853fe88190bfdf9dc197b1134860c3eac6c43f26b090447f944c1e0a4c
+    digest: 3a5ff1a1ffd3b5fc2292cc252a7d03119acb59a0a69c108677e6feeb6449beaf
     home: https://maximilianopizarro.github.io/demo-lightwell/
     icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/nexus.png
     keywords:
@@ -128,4 +130,4 @@ entries:
     urls:
     - https://maximilianopizarro.github.io/demo-lightwell/charts/nexus-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-07T18:44:12.358708498Z"
+generated: "2026-08-07T18:54:11.774890868Z"

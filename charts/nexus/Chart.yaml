@@ -5,7 +5,7 @@ type: application
 version: 0.1.0
 appVersion: "3.70.1"
 home: https://maximilianopizarro.github.io/demo-lightwell/
-icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/demo-lightwell-icon.png
+icon: https://raw.githubusercontent.com/maximilianoPizarro/demo-lightwell/main/docs/brand/nexus.png
 keywords:
   - lightwell
   - nexus

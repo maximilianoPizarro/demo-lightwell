@@ -22,6 +22,9 @@ components:
       env:
         - name: LIGHTWELL_TIER
           value: validated
+        # Trust Red Hat Dependency Analytics (Trusted Profile Analyzer client) for auth APIs.
+        - name: VSCODE_TRUSTED_EXTENSIONS
+          value: "redhat.fabric8-analytics"
 
 commands:
   - id: demo-up

@@ -30,7 +30,7 @@ Lightwell Java demo for **OpenShift Dev Spaces** on Developer Sandbox: legacy WA
 Clicking the badge above leverages the **Dev Spaces Factory URL** to automatically provision a complete cloud development environment directly in your Red Hat Developer Sandbox.
 
 - **Zero-Install Setup:** It reads the repository's `.devfile.yaml` to spin up a Red Hat Universal Developer Image (UDI) container with OpenJDK 17.
-- **Security Tooling Pre-configured:** Automatically installs the **Red Hat Dependency Analytics (RHDA)** VS Code extension, allowing instant Trusted Profile Analyzer (TPA) / Trusted Dependency Analyzer (TDA) CVE scanning directly in your IDE.
+- **Security Tooling Pre-configured:** Declares the **Trusted Profile Analyzer** IDE client — VS Code extension `redhat.fabric8-analytics` (Red Hat Dependency Analytics / RHDA) — in `.vscode/extensions.json` and `.che/extensions.json` so OpenShift Dev Spaces installs it at workspace startup.
 - **One-Click Execution:** Exposes custom IDE tasks (`demo-up`, `open-jboss-console`) to deploy Nexus, proxy Lightwell, and run the Tekton pipeline without touching a local terminal.
 
 ---

@@ -37,6 +37,8 @@ spec:
           env:
             - name: LIGHTWELL_TIER
               value: validated
+            - name: VSCODE_TRUSTED_EXTENSIONS
+              value: "redhat.fabric8-analytics"
     commands:
       - id: demo-up
         exec:

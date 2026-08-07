@@ -13,6 +13,8 @@ Lightweight **Sonatype Nexus Repository OSS** (single pod + PVC) used as an ente
 
 Developers and Tekton never call Lightwell with the SA from every Maven client. They talk to Nexus; Nexus authenticates to `packages.redhat.com` with Secret `lightwell-sa`. That is the pattern this chart teaches.
 
+**Deep dive (Pages):** [Nexus + Lightwell SA + Tekton settings.xml](https://maximilianopizarro.github.io/demo-lightwell/#nexus-tekton) — Secret → configure Job (Maven proxy + `maven-public` group) → ConfigMap `settings.xml` → Tekton workspace mount.
+
 ## Default Lightwell remote (validated demo)
 
 ```text

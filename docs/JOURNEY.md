@@ -16,6 +16,19 @@ Focus: **secure development** for legacy Java — remediate vulnerable third-par
 
 ![Architecture](lightwell-architecture.png)
 
+## Nexus service account + Tekton `settings.xml` (the hard part)
+
+Enterprise pattern encoded by the umbrella chart:
+
+1. **Secret `lightwell-sa`** — only place the Lightwell username/JWT are stored for the cluster path (`charts/demo-lightwell/templates/secrets.yaml`).
+2. **Nexus configure Job** — creates Maven **proxy** `maven-lightwell-validated` with SA auth on the remote URL, then updates group **`maven-public`** to include that proxy (`charts/nexus/templates/configure-job.yaml`). Cache lives on the Nexus PVC.
+3. **ConfigMap `maven-settings-lightwell`** — `settings.xml` with `mirrorOf *` → `http://nexus:8081/repository/maven-public/` and **no** `<servers>` for Lightwell (`charts/demo-lightwell/templates/maven-settings-configmap.yaml`).
+4. **Tekton workspace** — PipelineRun binds workspace `maven-settings` to that ConfigMap; Task `maven-lightwell` runs `mvn -s $(workspaces.maven-settings.path)/settings.xml` (`pipelinerun.yaml` + `tekton-pipeline.yaml`). The JWT never enters the Maven client.
+
+Contrast: GitHub Actions uses `app/settings-lightwell-direct.xml.template` and talks to Lightwell **without** Nexus.
+
+Longer write-up on Pages: [#nexus-tekton](https://maximilianopizarro.github.io/demo-lightwell/#nexus-tekton).
+
 ## Visual journey
 
 | Step | What you see |
@@ -26,7 +39,7 @@ Focus: **secure development** for legacy Java — remediate vulnerable third-par
 | 4. Lightwell validated registry | ![Lightwell](journey/05-lightwell-validated-registry.png) |
 | 5. Tekton PipelineRun | ![PipelineRuns](journey/06-tekton-pipelineruns.png) |
 | 6. JBoss app home | ![App home](journey/07-jboss-app-home.png) |
-| 7. Dev Spaces — RHDA plugin | ![RHDA](journey/08-devspaces-rhda-plugins.png) |
+| 7. Dev Spaces — Trusted Profile Analyzer plugin (`redhat.fabric8-analytics`) | ![RHDA/TPA](journey/08-devspaces-rhda-plugins.png) |
 | 7b. Devfile commands (analyze-cves) | ![Commands](journey/08b-devspaces-devfile-commands.png) |
 | 8. OpenShift Pipelines detail | ![Pipeline detail](journey/09b-pipelinerun-detail.png) |
 | 8b. Tekton maven logs → Nexus `commons-io` `.rhlw` | ![Maven Nexus commons-io](journey/09c-tekton-maven-nexus-commons-io.png) |

@@ -39,6 +39,8 @@ spec:
               value: {{ .Values.lightwell.tier | quote }}
             - name: DEMO_NAMESPACE
               value: {{ .Release.Namespace | quote }}
+            - name: VSCODE_TRUSTED_EXTENSIONS
+              value: "redhat.fabric8-analytics"
     commands:
       - id: demo-status
         exec:

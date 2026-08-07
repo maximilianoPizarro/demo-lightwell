@@ -31,6 +31,15 @@ Or open Dev Spaces and run the Devfile task **demo-up**.
 - Nexus browse shows Lightwell `.rhlw` artifacts
 - RHDA report on `app/pom.xml` (OSV findings + Red Hat remediations available — not “zero CVE”)
 
+## Nexus SA + Maven settings (Tekton)
+
+1. Values `lightwell.username` / `lightwell.token` → Secret `lightwell-sa`.
+2. Nexus configure Job creates proxy `maven-lightwell-validated` with that SA on the **remote**, then adds it to group `maven-public`.
+3. ConfigMap `maven-settings-lightwell` holds `settings.xml` (`mirrorOf *` → `http://nexus:8081/repository/maven-public/`) — **no** Lightwell password in the client.
+4. PipelineRun workspace `maven-settings` mounts that ConfigMap; Task runs `mvn -s …/settings.xml`.
+
+Full narrative: https://maximilianopizarro.github.io/demo-lightwell/#nexus-tekton
+
 ## Documentation
 
 End-to-end narrative, RHDA screenshots, Artifact Hub vs Lightwell, console access:  
